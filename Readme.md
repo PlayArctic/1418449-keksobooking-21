@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Вадим Б.](https://up.htmlacademy.ru/javascript/21/user/1418449).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Пальчук](https://htmlacademy.ru/profile/bulletok).
 
 ---
 
