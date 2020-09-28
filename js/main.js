@@ -21,7 +21,6 @@
       "y": случайное число, координата y метки на карте от 130 до 630.
   }
 }  */
-const map = document.querySelector(`.map`);
 const avatar = [{avatar: `img/avatars/user01.png`}, {avatar: `img/avatars/user02.png`}, {avatar: `img/avatars/user03.png`}, {avatar: `img/avatars/user04.png`}, {avatar: `img/avatars/user05.png`}, {avatar: `img/avatars/user06.png`}, {avatar: `img/avatars/user07.png`}, {avatar: `img/avatars/user08.png`}];
 const type = [{avatar: `palace`}, {avatar: `flat`}, {avatar: `house`}, {avatar: `bungalow`}];
 const checkin = [{checkin: `12:00`}, {checkin: `13:00`}, {checkin: `14:00`}];
@@ -45,7 +44,7 @@ let getPhotoset = function (photos = 5) {
 
 
 let getData = function () {
-  let adDataStorage = {};
+  let adDataStorage = [];
   for (let i = 0; i < 8; i++) {
     let adData = {
       "author": {
@@ -89,7 +88,7 @@ let getData = function () {
 
 Отрисуйте сгенерированные DOM-элементы в блок .map__pins. Для вставки элементов используйте DocumentFragment.
 */
-
+const map = document.querySelector(`.map`);
 let dataSource = getData();
 let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
 let poolPins = document.querySelector(`.map__pins`);
@@ -99,8 +98,8 @@ map.classList.remove(`map--faded`);
 
 for (let i = 0; i <= dataSource.length; i++) {
   let newPin = templatePinButton.cloneNode(true);
-  newPin.style.width = dataSource.location(`x`) - 20;
-  newPin.style.top = dataSource.location(`y`) - 40;
+  newPin.style.width = dataSource.location.x - 20;
+  newPin.style.top = dataSource.location.y - 40;
   let avatarImg = newPin.document.querySelector(`img`);
   avatarImg.src = dataSource.avatar;
   avatarImg.alt = dataSource.offer;
