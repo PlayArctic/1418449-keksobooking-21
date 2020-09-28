@@ -34,15 +34,17 @@ let getRandomNumber = function (min, max) {
 };
 
 let getPhotoset = function (photos = 5) {
+  let photoSet = [];
   for (let j = 0; j < getRandomNumber(1, photos); j++) {
     let photo = `http://o0.github.io/assets/images/tokyo/hotel${j}.jpg`;
-    let photoSet = photoSet.push(photo);
+    photoSet.push(photo);
   }
   return photoSet;
 };
 
 
 let getData = function () {
+  let adDataStorage = {};
   for (let i = 0; i < 8; i++) {
     let adData = {
       "author": {
@@ -66,7 +68,9 @@ let getData = function () {
         "y": getRandomNumber(130, 630),
       }
     };
-    let adDataStorage = adDataStorage.push(adData);
+    adDataStorage.push(adData);
   }
   return adDataStorage;
 };
+
+getData();
