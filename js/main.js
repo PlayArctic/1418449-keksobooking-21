@@ -36,8 +36,8 @@ let getRandomNumber = function (min, max) {
 let getPhotoset = function (photos = 5) {
   let photoSet = [];
   for (let j = 0; j < getRandomNumber(1, photos); j++) {
-    let photo = `http://o0.github.io/assets/images/tokyo/hotel${j}.jpg`;
-    /* photoSet.push(photo); */
+    /* let photo = `http://o0.github.io/assets/images/tokyo/hotel${j}.jpg`;
+    photoSet.push(photo); */
     photoSet.push(`http://o0.github.io/assets/images/tokyo/hotel${j}.jpg`);
   }
   return photoSet;
