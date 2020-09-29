@@ -21,12 +21,11 @@
       "y": случайное число, координата y метки на карте от 130 до 630.
   }
 }  */
-const avatar = [{avatar: `img/avatars/user01.png`}, {avatar: `img/avatars/user02.png`}, {avatar: `img/avatars/user03.png`}, {avatar: `img/avatars/user04.png`}, {avatar: `img/avatars/user05.png`}, {avatar: `img/avatars/user06.png`}, {avatar: `img/avatars/user07.png`}, {avatar: `img/avatars/user08.png`}];
-const type = [{avatar: `palace`}, {avatar: `flat`}, {avatar: `house`}, {avatar: `bungalow`}];
-const checkin = [{checkin: `12:00`}, {checkin: `13:00`}, {checkin: `14:00`}];
-const checkout = [{checkout: `12:00`}, {checkout: `13:00`}, {checkout: `14:00`}];
-const features = [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`];
-
+const AVATAR = [{avatar: `img/avatars/user01.png`}, {avatar: `img/avatars/user02.png`}, {avatar: `img/avatars/user03.png`}, {avatar: `img/avatars/user04.png`}, {avatar: `img/avatars/user05.png`}, {avatar: `img/avatars/user06.png`}, {avatar: `img/avatars/user07.png`}, {avatar: `img/avatars/user08.png`}];
+const TYPE = [{type: `palace`}, {type: `flat`}, {type: `house`}, {type: `bungalow`}];
+const CHECKIN = [{checkin: `12:00`}, {checkin: `13:00`}, {checkin: `14:00`}];
+const CHECKOUT = [{checkout: `12:00`}, {checkout: `13:00`}, {checkout: `14:00`}];
+const FEATURES = [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`];
 
 let getRandomNumber = function (min, max) {
   return Math.round(((Math.random() * (max - min)) + min));
@@ -42,29 +41,28 @@ let getPhotoset = function (photos = 5) {
   return photoSet;
 };
 
-
 let getData = function () {
   let adDataStorage = [];
   for (let i = 0; i < 8; i++) {
     let adData = {
       "author": {
-        "avatar": avatar[i],
+        "avatar": AVATAR[i].avatar,
       },
       "offer": {
-        "title": `Заголовок предложения ${i}`,
+        "title": `Заголовок предложения ${i + 1}`,
         "address": `${getRandomNumber(0, 600)}, ${getRandomNumber(0, 350)}`,
         "price": `${getRandomNumber(1000, 5000)}`,
-        "type": type[getRandomNumber(0, 3)],
+        "type": TYPE[getRandomNumber(0, 3)],
         "rooms": getRandomNumber(1, 3),
         "guests": getRandomNumber(1, 4),
-        "checkin": checkin[getRandomNumber(0, 2)],
-        "checkout": checkout[getRandomNumber(0, 2)],
-        "features": features.slice(0, getRandomNumber(1, 5)),
+        "checkin": CHECKIN[getRandomNumber(0, 2)],
+        "checkout": CHECKOUT[getRandomNumber(0, 2)],
+        "features": FEATURES.slice(0, getRandomNumber(1, 5)),
         "description": `Строка с описанием ${i}`,
         "photos": getPhotoset(),
       },
       "location": {
-        "x": getRandomNumber(130, 630),
+        "x": getRandomNumber(130, 1200),
         "y": getRandomNumber(130, 630),
       }
     };
@@ -88,24 +86,26 @@ let getData = function () {
 
 Отрисуйте сгенерированные DOM-элементы в блок .map__pins. Для вставки элементов используйте DocumentFragment.
 */
-const map = document.querySelector(`.map`);
-let dataSource = getData();
-let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
-let poolPins = document.querySelector(`.map__pins`);
-let fragment = document.createDocumentFragment();
 
-map.classList.remove(`map--faded`);
 
-for (let i = 0; i <= dataSource.length; i++) {
-  let newPin = templatePinButton.cloneNode(true);
-  newPin.style.width = dataSource.location.x - 20;
-  newPin.style.top = dataSource.location.y - 40;
-  let avatarImg = newPin.document.querySelector(`img`);
-  avatarImg.src = dataSource.avatar;
-  avatarImg.alt = dataSource.offer;
+let renderPins = function () {
+  let map = document.querySelector(`.map`);
+  let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
+  let poolPins = document.querySelector(`.map__pins`);
+  let fragment = document.createDocumentFragment();
+  map.classList.remove(`map--faded`);
+  let dataSource = getData();
+  for (let i = 0; i < 8; i++) {
+    let newPin = templatePinButton.cloneNode(true);
+    newPin.style.left = (dataSource[i].location.x - 20) + `px`;
+    newPin.style.top = (dataSource[i].location.y - 40) + `px`;
+    let avatarImg = newPin.querySelector(`img`);
+    avatarImg.src = dataSource[i].author.avatar;
+    avatarImg.alt = dataSource[i].offer.title;
+    fragment.appendChild(newPin);
+    /* console.log(newPin); */
+  }
+  return poolPins.appendChild(fragment);
+};
 
-  fragment.appendChild(newPin);
-}
-
-poolPins.appendChild(fragment);
-
+renderPins();
