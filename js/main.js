@@ -23,9 +23,10 @@
 }  */
 const AVATAR = [{avatar: `img/avatars/user01.png`}, {avatar: `img/avatars/user02.png`}, {avatar: `img/avatars/user03.png`}, {avatar: `img/avatars/user04.png`}, {avatar: `img/avatars/user05.png`}, {avatar: `img/avatars/user06.png`}, {avatar: `img/avatars/user07.png`}, {avatar: `img/avatars/user08.png`}];
 const TYPE = [{type: `palace`}, {type: `flat`}, {type: `house`}, {type: `bungalow`}];
-const CHECKIN = [{checkin: `12:00`}, {checkin: `13:00`}, {checkin: `14:00`}];
-const CHECKOUT = [{checkout: `12:00`}, {checkout: `13:00`}, {checkout: `14:00`}];
+const CHECKIN = [`12:00`, `13:00`, `14:00`];
+const CHECKOUT = [`12:00`, `13:00`, `14:00`];
 const FEATURES = [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`];
+let map = document.querySelector(`.map`);
 
 let getRandomNumber = function (min, max) {
   return Math.round(((Math.random() * (max - min)) + min));
@@ -51,14 +52,14 @@ let getData = function () {
       "offer": {
         "title": `Заголовок предложения ${i + 1}`,
         "address": `${getRandomNumber(0, 600)}, ${getRandomNumber(0, 350)}`,
-        "price": `${getRandomNumber(1000, 5000)}`,
+        "price": `${getRandomNumber(1000, 50000)}`,
         "type": TYPE[getRandomNumber(0, 3)],
-        "rooms": getRandomNumber(1, 3),
-        "guests": getRandomNumber(1, 4),
+        "rooms": getRandomNumber(1, 4),
+        "guests": getRandomNumber(1, 3),
         "checkin": CHECKIN[getRandomNumber(0, 2)],
         "checkout": CHECKOUT[getRandomNumber(0, 2)],
         "features": FEATURES.slice(0, getRandomNumber(1, 5)),
-        "description": `Строка с описанием ${i}`,
+        "description": `Строка с описанием ${i + 1}`,
         "photos": getPhotoset(),
       },
       "location": {
@@ -70,6 +71,8 @@ let getData = function () {
   }
   return adDataStorage;
 };
+
+let dataSource = getData();
 
 /* <template id="pin">
 <button type="button" class="map__pin" style="left: 200px; top: 400px;">
@@ -89,12 +92,11 @@ let getData = function () {
 
 
 let renderPins = function () {
-  let map = document.querySelector(`.map`);
   let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
   let poolPins = document.querySelector(`.map__pins`);
   let fragment = document.createDocumentFragment();
+
   map.classList.remove(`map--faded`);
-  let dataSource = getData();
   for (let i = 0; i < 8; i++) {
     let newPin = templatePinButton.cloneNode(true);
     newPin.style.left = (dataSource[i].location.x - 20) + `px`;
@@ -103,9 +105,141 @@ let renderPins = function () {
     avatarImg.src = dataSource[i].author.avatar;
     avatarImg.alt = dataSource[i].offer.title;
     fragment.appendChild(newPin);
-    /* console.log(newPin); */
   }
+
   return poolPins.appendChild(fragment);
 };
 
+let renderCard = function () {
+  for (let i = 0; i < 1; i++) { // по заданию ограничиваем до одного объявления
+    let templateCard = document.querySelector(`#card`).content;
+    let newCard = templateCard.cloneNode(true);
+    let templateCardtitle = newCard.querySelector(`.popup__title`);
+    let templateCardAddress = newCard.querySelector(`.popup__text--address`);
+    let templateCardPrice = newCard.querySelector(`.popup__text--price`);
+    let templateCardType = newCard.querySelector(`.popup__type`);
+    let templateCardCapacity = newCard.querySelector(`.popup__text--capacity`);
+    let templateCardTime = newCard.querySelector(`.popup__text--time`);
+    let templateCardFeatures = newCard.querySelector(`.popup__features`);
+    let templateCardDescription = newCard.querySelector(`.popup__description`);
+    let templateCardPhoto = newCard.querySelector(`.popup__photos`);
+    let templateCardAvatar = newCard.querySelector(`.popup__avatar`);
+
+    let getCardFeatures = function () {
+      let fragmentsFeatures = document.createDocumentFragment();
+      let currentPoolFeatures = dataSource[0].offer.features;
+
+      for (let j = 0; j < currentPoolFeatures.length; j++) {
+        let createElementFeature = document.createElement(`li`);
+        createElementFeature.classList.add(`popup__feature`, `popup__feature--${currentPoolFeatures[j]}`);
+        fragmentsFeatures.appendChild(createElementFeature);
+      }
+      return fragmentsFeatures;
+    };
+
+    let getCardPhotos = function () {
+      let fragmentsPhotos = document.createDocumentFragment();
+      let currentPoolPhotos = dataSource[0].offer.photos;
+
+      for (let j = 0; j < currentPoolPhotos.length; j++) {
+        let createElementPhoto = document.createElement(`img`);
+        createElementPhoto.style.src = currentPoolPhotos[j];
+        createElementPhoto.style.width = `45px`;
+        createElementPhoto.style.height = `40px`;
+        createElementPhoto.setAttribute = (`alt`, `Фотография жилья`); // !не работает
+        createElementPhoto.style.alt = `Фотография жилья`; // !не работает
+        createElementPhoto.classList.add(`popup__photo`);
+        fragmentsPhotos.appendChild(createElementPhoto);
+      }
+      return fragmentsPhotos;
+    };
+
+    templateCardtitle.textContent = dataSource[i].offer.title;
+    templateCardAddress.textContent = dataSource[i].offer.address;
+    templateCardPrice.textContent = []; // обнуляем старые значения
+    templateCardPrice.insertAdjacentHTML(`afterbegin`, `${dataSource[i].offer.price}₽<span> /ночь</span>`);
+    templateCardType.textContent = dataSource[i].offer.TYPE;
+    templateCardCapacity.textContent = `${dataSource[i].offer.rooms} комнаты для ${dataSource[i].offer.guests} гостей`;
+    templateCardTime.textContent = `Заезд после ${dataSource[i].offer.checkin}, выезд до ${dataSource[i].offer.checkout}`;
+    templateCardFeatures.textContent = []; // обнуляем старые значения
+    templateCardFeatures.appendChild(getCardFeatures());
+    templateCardDescription.textContent = dataSource[i].offer.description;
+    templateCardPhoto.textContent = []; // обнуляем старые значения
+    templateCardPhoto.appendChild(getCardPhotos());
+    templateCardAvatar.style.src = dataSource[i].author.avatar;
+
+    map.appendChild(newCard);
+  }
+};
+
 renderPins();
+renderCard();
+
+
+/*     let getCardFeatures = function () {
+      let fragmentsAll = [];
+
+      for (let j = 0; j < dataSource[j].length; j++) { // перебираем все возможные массивы
+        let currentPoolFeatures = dataSource[i].offer.features;
+        let fragments = [];
+
+        for (let i = 0; i < currentPoolFeatures.length; i++) { // перебираем значения каждого массива
+          let fragment = document.createDocumentFragment();
+          fragment = fragment.insertAjasentHTML(`afterbegin`, `<li class="popup__feature popup__feature--${currentPoolFeatures[j]}"></li>`);
+           ;
+          fragment.classList.add(`.popup__feature--${dataSource[i].offer.features[j]}`);
+        }
+        fragmentsAll = appendChild(fragm)
+      }
+      return fragmentsAll;
+    };
+*/
+/*
+
+На основе первого по порядку элемента из сгенерированного массива и шаблона #card создайте DOM-элемент объявления (карточка объявления),
+заполните его данными из объекта:
+
+-Выведите заголовок объявления offer.title в заголовок .popup__title.
+-Выведите адрес offer.address в блок .popup__text--address.
+-Выведите цену offer.price в блок .popup__text--price строкой вида {{offer.price}}₽/ночь. Например, 5200₽/ночь.
+
+-В блок .popup__type выведите тип жилья offer.type: Квартира для flat, Бунгало для bungalow, Дом для house, Дворец для palace.
+-Выведите количество гостей и комнат offer.rooms и offer.guests в блок .popup__text--capacity строкой вида {{offer.rooms}} комнаты для {{offer.guests}} гостей.
+Например, 2 комнаты для 3 гостей.
+-Время заезда и выезда offer.checkin и offer.checkout в блок .popup__text--time строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}.
+Например, заезд после 14:00, выезд до 12:00.
+-В список .popup__features выведите все доступные удобства в объявлении.
+-В блок .popup__description выведите описание объекта недвижимости offer.description.
+-В блок .popup__photos выведите все фотографии из списка offer.photos. Каждая из строк массива photos должна записываться как src соответствующего изображения.
+-Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
+
+Если данных для заполнения не хватает, соответствующий блок в карточке скрывается.
+
+Вставьте полученный DOM-элемент в блок .map перед блоком.map__filters-container.
+
+<template id="card">
+    <article class="map__card popup">
+      <img src="img/avatars/user01.png" class="popup__avatar" width="70" height="70" alt="Аватар пользователя">
+      <button type="button" class="popup__close">Закрыть</button>
+      <h3 class="popup__title">Уютное гнездышко для молодоженов</h3>
+      <p class="popup__text popup__text--address">102-0082 Tōkyō-to, Chiyoda-ku, Ichibanchō, 14−3</p>
+      <p class="popup__text popup__text--price">5200₽<span>/ночь</span></p>
+      <h4 class="popup__type">Квартира</h4>
+      <p class="popup__text popup__text--capacity">2 комнаты для 3 гостей</p>
+      <p class="popup__text popup__text--time">Заезд после 14:00, выезд до 10:00</p>
+      <ul class="popup__features">
+        <li class="popup__feature popup__feature--wifi"></li>
+        <li class="popup__feature popup__feature--dishwasher"></li>
+        <li class="popup__feature popup__feature--parking"></li>
+        <li class="popup__feature popup__feature--washer"></li>
+        <li class="popup__feature popup__feature--elevator"></li>
+        <li class="popup__feature popup__feature--conditioner"></li>
+      </ul>
+      <p class="popup__description">Великолепная квартира-студия в центре Токио. Подходит как туристам, так и бизнесменам. Квартира полностью укомплектована и недавно отремонтирована.</p>
+      <div class="popup__photos">
+        <img src="" class="popup__photo" width="45" height="40" alt="Фотография жилья">
+      </div>
+    </article>
+  </template>
+*/
+
