@@ -1,4 +1,6 @@
 'use strict';
+
+/* Готовим массив данных для загрузки на сайт */
 /* {
   "author": {
       "avatar": строка, адрес изображения вида img/avatars/user{{xx}}.png, где {{xx}} это число от 1 до 8 с ведущим нулём. Например, 01, 02 и т. д. Адреса изображений не повторяются
@@ -74,6 +76,8 @@ let getData = function () {
 
 let dataSource = getData();
 
+/* Отрисовываем Pins */
+
 /* <template id="pin">
 <button type="button" class="map__pin" style="left: 200px; top: 400px;">
   <img src="img/avatars/user07.png" width="40" height="40" draggable="false" alt="Метка объявления">
@@ -89,7 +93,6 @@ let dataSource = getData();
 
 Отрисуйте сгенерированные DOM-элементы в блок .map__pins. Для вставки элементов используйте DocumentFragment.
 */
-
 
 let renderPins = function () {
   let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
@@ -110,92 +113,9 @@ let renderPins = function () {
   return poolPins.appendChild(fragment);
 };
 
-let renderCard = function () {
-  for (let i = 0; i < 1; i++) { // по заданию ограничиваем до одного объявления
-    let templateCard = document.querySelector(`#card`).content;
-    let newCard = templateCard.cloneNode(true);
-    let templateCardtitle = newCard.querySelector(`.popup__title`);
-    let templateCardAddress = newCard.querySelector(`.popup__text--address`);
-    let templateCardPrice = newCard.querySelector(`.popup__text--price`);
-    let templateCardType = newCard.querySelector(`.popup__type`);
-    let templateCardCapacity = newCard.querySelector(`.popup__text--capacity`);
-    let templateCardTime = newCard.querySelector(`.popup__text--time`);
-    let templateCardFeatures = newCard.querySelector(`.popup__features`);
-    let templateCardDescription = newCard.querySelector(`.popup__description`);
-    let templateCardPhoto = newCard.querySelector(`.popup__photos`);
-    let templateCardAvatar = newCard.querySelector(`.popup__avatar`);
+/* Данные для отрисовки карточки */
 
-    let getCardFeatures = function () {
-      let fragmentsFeatures = document.createDocumentFragment();
-      let currentPoolFeatures = dataSource[0].offer.features;
-
-      for (let j = 0; j < currentPoolFeatures.length; j++) {
-        let createElementFeature = document.createElement(`li`);
-        createElementFeature.classList.add(`popup__feature`, `popup__feature--${currentPoolFeatures[j]}`);
-        fragmentsFeatures.appendChild(createElementFeature);
-      }
-      return fragmentsFeatures;
-    };
-
-    let getCardPhotos = function () {
-      let fragmentsPhotos = document.createDocumentFragment();
-      let currentPoolPhotos = dataSource[0].offer.photos;
-
-      for (let j = 0; j < currentPoolPhotos.length; j++) {
-        let createElementPhoto = document.createElement(`img`);
-        createElementPhoto.style.src = currentPoolPhotos[j];
-        createElementPhoto.style.width = `45px`;
-        createElementPhoto.style.height = `40px`;
-        createElementPhoto.setAttribute = (`alt`, `Фотография жилья`); // !не работает
-        createElementPhoto.style.alt = `Фотография жилья`; // !не работает
-        createElementPhoto.classList.add(`popup__photo`);
-        fragmentsPhotos.appendChild(createElementPhoto);
-      }
-      return fragmentsPhotos;
-    };
-
-    templateCardtitle.textContent = dataSource[i].offer.title;
-    templateCardAddress.textContent = dataSource[i].offer.address;
-    templateCardPrice.textContent = []; // обнуляем старые значения
-    templateCardPrice.insertAdjacentHTML(`afterbegin`, `${dataSource[i].offer.price}₽<span> /ночь</span>`);
-    templateCardType.textContent = dataSource[i].offer.TYPE;
-    templateCardCapacity.textContent = `${dataSource[i].offer.rooms} комнаты для ${dataSource[i].offer.guests} гостей`;
-    templateCardTime.textContent = `Заезд после ${dataSource[i].offer.checkin}, выезд до ${dataSource[i].offer.checkout}`;
-    templateCardFeatures.textContent = []; // обнуляем старые значения
-    templateCardFeatures.appendChild(getCardFeatures());
-    templateCardDescription.textContent = dataSource[i].offer.description;
-    templateCardPhoto.textContent = []; // обнуляем старые значения
-    templateCardPhoto.appendChild(getCardPhotos());
-    templateCardAvatar.style.src = dataSource[i].author.avatar;
-
-    map.appendChild(newCard);
-  }
-};
-
-renderPins();
-renderCard();
-
-
-/*     let getCardFeatures = function () {
-      let fragmentsAll = [];
-
-      for (let j = 0; j < dataSource[j].length; j++) { // перебираем все возможные массивы
-        let currentPoolFeatures = dataSource[i].offer.features;
-        let fragments = [];
-
-        for (let i = 0; i < currentPoolFeatures.length; i++) { // перебираем значения каждого массива
-          let fragment = document.createDocumentFragment();
-          fragment = fragment.insertAjasentHTML(`afterbegin`, `<li class="popup__feature popup__feature--${currentPoolFeatures[j]}"></li>`);
-           ;
-          fragment.classList.add(`.popup__feature--${dataSource[i].offer.features[j]}`);
-        }
-        fragmentsAll = appendChild(fragm)
-      }
-      return fragmentsAll;
-    };
-*/
 /*
-
 На основе первого по порядку элемента из сгенерированного массива и шаблона #card создайте DOM-элемент объявления (карточка объявления),
 заполните его данными из объекта:
 
@@ -242,4 +162,104 @@ renderCard();
     </article>
   </template>
 */
+
+let setCardTitle = function (cardName, cardNumber) {
+  let templateCardtitle = cardName.querySelector(`.popup__title`);
+  templateCardtitle.textContent = dataSource[cardNumber].offer.title;
+};
+
+let setCardAddress = function (cardName, cardNumber) {
+  let templateCardAddress = cardName.querySelector(`.popup__text--address`);
+  templateCardAddress.textContent = dataSource[cardNumber].offer.address;
+};
+
+let setCardPrice = function (cardName, cardNumber) {
+  let templateCardPrice = cardName.querySelector(`.popup__text--price`);
+  templateCardPrice.textContent = []; // обнуляем старые значения
+  templateCardPrice.insertAdjacentHTML(`afterbegin`, `${dataSource[cardNumber].offer.price}₽<span> /ночь</span>`);
+};
+
+let setCardType = function (cardName, cardNumber) {
+  let templateCardType = cardName.querySelector(`.popup__type`);
+  templateCardType.textContent = dataSource[cardNumber].offer.TYPE;
+};
+
+let setCardCapacity = function (cardName, cardNumber) {
+  let templateCardCapacity = cardName.querySelector(`.popup__text--capacity`);
+  templateCardCapacity.textContent = `${dataSource[cardNumber].offer.rooms} комнаты для ${dataSource[cardNumber].offer.guests} гостей`;
+};
+
+let setCardTime = function (cardName, cardNumber) {
+  let templateCardTime = cardName.querySelector(`.popup__text--time`);
+  templateCardTime.textContent = `Заезд после ${dataSource[cardNumber].offer.checkin}, выезд до ${dataSource[cardNumber].offer.checkout}`;
+};
+
+let setCardFeatures = function (cardName, cardNumber) {
+  let templateCardFeatures = cardName.querySelector(`.popup__features`);
+  let fragmentsFeatures = document.createDocumentFragment();
+  let currentPoolFeatures = dataSource[cardNumber].offer.features;
+
+  for (let j = 0; j < currentPoolFeatures.length; j++) {
+    let createElementFeature = document.createElement(`li`);
+    createElementFeature.classList.add(`popup__feature`, `popup__feature--${currentPoolFeatures[j]}`);
+    fragmentsFeatures.appendChild(createElementFeature);
+  }
+
+  templateCardFeatures.textContent = []; // обнуляем старые значения
+  templateCardFeatures.appendChild(fragmentsFeatures);
+};
+
+let setCardDescription = function (cardName, cardNumber) {
+  let templateCardDescription = cardName.querySelector(`.popup__description`);
+  templateCardDescription.textContent = dataSource[cardNumber].offer.description;
+};
+
+let setCardPhotos = function (cardName, cardNumber) {
+  let fragmentsPhotos = document.createDocumentFragment();
+  let currentPoolPhotos = dataSource[cardNumber].offer.photos;
+  let templateCardPhotos = cardName.querySelector(`.popup__photos`);
+
+  for (let j = 0; j < currentPoolPhotos.length; j++) {
+    let createElementPhoto = document.createElement(`img`);
+    createElementPhoto.style.src = currentPoolPhotos[j];
+    createElementPhoto.style.width = `45px`;
+    createElementPhoto.style.height = `40px`;
+    /* createElementPhoto.setAttribute = (`alt`, `Фотография жилья`); // setAttribute это функция в которую нужно передавать параметры а не присваивать что-то*/
+    createElementPhoto.alt = `Фотография жилья`;
+    createElementPhoto.classList.add(`popup__photo`);
+    fragmentsPhotos.appendChild(createElementPhoto);
+  }
+
+  templateCardPhotos.textContent = []; // обнуляем старые значения
+  templateCardPhotos.appendChild(fragmentsPhotos);
+};
+
+let setCardAvatar = function (cardName, cardNumber) {
+  let templateCardAvatar = cardName.querySelector(`.popup__avatar`);
+  templateCardAvatar.style.src = dataSource[cardNumber].author.avatar;
+};
+
+let renderCard = function () {
+  for (let i = 0; i < 1; i++) { // по заданию ограничиваем до одного объявления
+    let templateCard = document.querySelector(`#card`).content;
+    let newCard = templateCard.cloneNode(true);
+
+    setCardTitle(newCard, i);
+    setCardAddress(newCard, i);
+    setCardPrice(newCard, i);
+    setCardType(newCard, i);
+    setCardCapacity(newCard, i);
+    setCardTime(newCard, i);
+    setCardFeatures(newCard, i);
+    setCardDescription(newCard, i);
+    setCardPhotos(newCard, i);
+    setCardAvatar(newCard, i);
+    map.appendChild(newCard);
+  }
+};
+
+/* Запускаем итоговые функции */
+renderPins();
+renderCard();
+
 
