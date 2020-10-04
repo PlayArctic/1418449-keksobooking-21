@@ -23,8 +23,10 @@
       "y": случайное число, координата y метки на карте от 130 до 630.
   }
 }  */
-const AVATAR = [{avatar: `img/avatars/user01.png`}, {avatar: `img/avatars/user02.png`}, {avatar: `img/avatars/user03.png`}, {avatar: `img/avatars/user04.png`}, {avatar: `img/avatars/user05.png`}, {avatar: `img/avatars/user06.png`}, {avatar: `img/avatars/user07.png`}, {avatar: `img/avatars/user08.png`}];
-const TYPE = [{type: `palace`}, {type: `flat`}, {type: `house`}, {type: `bungalow`}];
+// eslint-disable-next-line object-curly-spacing
+const AVATAR = [{ avatar: `img/avatars/user01.png` }, { avatar: `img/avatars/user02.png` }, { avatar: `img/avatars/user03.png` }, { avatar: `img/avatars/user04.png` }, { avatar: `img/avatars/user05.png` }, { avatar: `img/avatars/user06.png` }, { avatar: `img/avatars/user07.png` }, { avatar: `img/avatars/user08.png` }];
+// eslint-disable-next-line object-curly-spacing
+const TYPE = [{ type: `palace` }, { type: `flat` }, { type: `house` }, { type: `bungalow` }];
 const CHECKIN = [`12:00`, `13:00`, `14:00`];
 const CHECKOUT = [`12:00`, `13:00`, `14:00`];
 const FEATURES = [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`];
@@ -99,7 +101,6 @@ let renderPins = function () {
   let poolPins = document.querySelector(`.map__pins`);
   let fragment = document.createDocumentFragment();
 
-  map.classList.remove(`map--faded`);
   for (let i = 0; i < 8; i++) {
     let newPin = templatePinButton.cloneNode(true);
     newPin.style.left = (dataSource[i].location.x - 20) + `px`;
@@ -176,7 +177,7 @@ let setCardAddress = function (cardName, cardNumber) {
 let setCardPrice = function (cardName, cardNumber) {
   let templateCardPrice = cardName.querySelector(`.popup__text--price`);
   templateCardPrice.textContent = []; // обнуляем старые значения
-  templateCardPrice.insertAdjacentHTML(`afterbegin`, `${dataSource[cardNumber].offer.price}₽<span> /ночь</span>`);
+  templateCardPrice.innerHTML = (`${dataSource[cardNumber].offer.price}₽<span> /ночь</span>`);
 };
 
 let setCardType = function (cardName, cardNumber) {
@@ -258,8 +259,63 @@ let renderCard = function () {
   }
 };
 
+/* Вешаем обработчики событий*/
+
+let mapPin = document.querySelector(`.map__pin--main`);
+let mapFaded = document.querySelector(`.map--faded`);
+let mapFilters = document.querySelectorAll(`.map__filter`);
+let mapFeaures = document.querySelector(`.map__features`);
+let mapAdFormDisabled = document.querySelector(`.ad-form--disabled`);
+let adFormAll = document.querySelectorAll(`.ad-form__element`);
+let currentAddress = document.querySelector(`#address`);
+
+let adFormDisable = function () {
+  for (let i of adFormAll) {
+    i.setAttribute(`disabled`, `disabled`);
+  }
+  for (let i of mapFilters) {
+    i.setAttribute(`disabled`, `disabled`);
+  }
+  mapFeaures.setAttribute(`disabled`, `disabled`);
+};
+
+let adFormEnable = function () {
+  for (let i of adFormAll) {
+    i.removeAttribute(`disabled`);
+  }
+  for (let i of mapFilters) {
+    i.removeAttribute(`disabled`);
+  }
+  mapFeaures.removeAttribute(`disabled`);
+};
+
+let setCurrentAddress = function () {
+  currentAddress.value = (`${mapPin.style.left.replace(/px/, ``) - 32}, ${mapPin.style.top.replace(/px/, ``) - 70}`);
+};
+
+adFormDisable();
+
+if (mapFaded) {
+  mapPin.addEventListener(`mousedown`, function (evt) {
+    if (evt.which === 1) {
+      adFormActicateAll();
+      setCurrentAddress();
+    }
+  });
+
+  mapPin.addEventListener(`keydown`, function (evt) {
+    if (evt.keyCode === 13) {
+      adFormActicateAll();
+    }
+  });
+}
+
+let adFormActicateAll = function () {
+  mapFaded.classList.remove(`map--faded`);
+  mapAdFormDisabled.classList.remove(`ad-form--disabled`);
+  renderPins();
+  // renderCard();
+  adFormEnable();
+};
+
 /* Запускаем итоговые функции */
-renderPins();
-renderCard();
-
-
