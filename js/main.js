@@ -291,6 +291,7 @@ let adFormEnable = function () {
 
 let setCurrentAddress = function () {
   currentAddress.value = (`${mapPin.style.left.replace(/px/, ``) - 32}, ${mapPin.style.top.replace(/px/, ``) - 70}`);
+  currentAddress.setAttribute(`readonly`, `readonly`);
 };
 
 adFormDisable();
@@ -314,8 +315,138 @@ let adFormActicateAll = function () {
   mapFaded.classList.remove(`map--faded`);
   mapAdFormDisabled.classList.remove(`ad-form--disabled`);
   renderPins();
-  // renderCard();
+  renderCard();
   adFormEnable();
 };
 
-/* Запускаем итоговые функции */
+/* Валидация */
+
+/*
+3. Ограничения, накладываемые на поля ввода
+3.1. Заголовок объявления:
+Обязательное текстовое поле;
+Минимальная длина — 30 символов;
+Максимальная длина — 100 символов.
+3.2. Цена за ночь:
+Обязательное поле;
+Числовое поле;
+Максимальное значение — 1000000.
+3.3. Поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»:
+«Бунгало» — минимальная цена за ночь 0;
+«Квартира» — минимальная цена за ночь 1 000;
+«Дом» — минимальная цена 5 000;
+«Дворец» — минимальная цена 10 000.
+Обратите внимание: вместе с минимальным значением цены нужно изменять и плейсхолдер.
+Обратите внимание: ограничение минимальной цены заключается именно в изменении минимального значения, которое можно ввести в поле с ценой, изменять само значение поля не нужно, это приведёт к плохому UX (опыту взаимодействия). Даже если текущее значение не попадает под новые ограничения не стоит без ведома пользователя изменять значение поля.
+3.4. Адрес: ручное редактирование поля запрещено. Значение автоматически выставляется при перемещении метки .map__pin--main по карте. Подробности заполнения поля адреса, описаны вместе с поведением метки.
+3.5. Поля «Время заезда» и «Время выезда» синхронизированы: при изменении значения одного поля, во втором выделяется соответствующее ему. Например, если время заезда указано «после 14», то время выезда будет равно «до 14» и наоборот.
+3.7. Значением полей «Ваша фотография» и «Фотография жилья» может быть только изображение.
+*/
+
+let titleVal = document.querySelector(`#title`);
+let priceVal = document.querySelector(`#price`);
+let typeVal = document.querySelector(`#type`);
+let timeIn = document.querySelector(`#timein`);
+let timeOut = document.querySelector(`#timeout`);
+let roomNumber = document.querySelector(`#room_number`);
+let roomCapacity = document.querySelector(`#capacity`);
+let avatarType = document.querySelector(`#avatar`);
+let imagesType = document.querySelector(`#images`);
+
+avatarType.setAttribute(`accept`, `image/png, image/jpeg`);
+imagesType.setAttribute(`accept`, `image/png, image/jpeg`);
+
+titleVal.addEventListener(`input`, function () {
+  let valueLength = titleVal.value.length;
+  const MIN_NAME_LENGTH = 30;
+  const MAX_NAME_LENGTH = 100;
+
+  if (valueLength < MIN_NAME_LENGTH) {
+    titleVal.setCustomValidity(`Еще ` + (MIN_NAME_LENGTH - valueLength) + ` символов.`);
+  } else if (valueLength > MAX_NAME_LENGTH) {
+    titleVal.setCustomValidity(`Удалите лишние ` + (valueLength - MAX_NAME_LENGTH) + ` символов.`);
+  } else {
+    titleVal.setCustomValidity(``);
+  }
+
+  titleVal.reportValidity(); // нужен тк после setCustomValidity браузер далее валидность не проверяет
+});
+
+
+priceVal.addEventListener(`input`, function () {
+  let currentPrice = priceVal.value;
+  const MAX_PRICE = 1000000;
+
+  priceVal.setAttribute(`required`, `required`);
+
+  if (currentPrice > MAX_PRICE) {
+    priceVal.setCustomValidity(`Цена не должна превышать ${MAX_PRICE}`);
+  } else {
+    priceVal.setCustomValidity(``);
+  }
+
+  priceVal.reportValidity();
+});
+
+typeVal.addEventListener(`input`, function () {
+  if (typeVal.value === `bungalow`) {
+    priceVal.setAttribute(`min`, `0`);
+    priceVal.setAttribute(`placeholder`, `0`);
+  } else if (typeVal.value === `flat`) {
+    priceVal.setAttribute(`min`, `1000`);
+    priceVal.setAttribute(`placeholder`, `1000`);
+  } else if (typeVal.value === `house`) {
+    priceVal.setAttribute(`min`, `5000`);
+    priceVal.setAttribute(`placeholder`, `5000`);
+  } else if (typeVal.value === `palace`) {
+    priceVal.setAttribute(`min`, `10000`);
+    priceVal.setAttribute(`placeholder`, `10000`);
+  }
+});
+
+
+timeIn.addEventListener(`input`, function () {
+  if (timeIn.value === `12:00`) {
+    timeOut.value = `12:00`;
+  } else if (timeIn.value === `13:00`) {
+    timeOut.value = `13:00`;
+  } else if (timeIn.value === `14:00`) {
+    timeOut.value = `14:00`;
+  }
+});
+
+timeOut.addEventListener(`input`, function () {
+  if (timeOut.value === `12:00`) {
+    timeIn.value = `12:00`;
+  } else if (timeOut.value === `13:00`) {
+    timeIn.value = `13:00`;
+  } else if (timeOut.value === `14:00`) {
+    timeIn.value = `14:00`;
+  }
+});
+
+
+roomNumber.addEventListener(`input`, function () { // !не сделано
+  let dependences = {1: `[1]`, 2: `[1, 2]`, 3: `[1, 2, 3]`, 100: `[0]`};
+
+  if (roomNumber.value = dependences.1) {
+
+  }
+});
+
+
+/*
+3.6. Поле «Количество комнат» синхронизировано с полем «Количество мест» таким образом,
+что при выборе количества комнат вводятся ограничения на допустимые варианты выбора количества
+ гостей:
+1 комната — «для 1 гостя»;
+2 комнаты — «для 2 гостей» или «для 1 гостя»;
+3 комнаты — «для 3 гостей», «для 2 гостей» или «для 1 гостя»;
+100 комнат — «не для гостей».
+Обратите внимание: допускаются разные способы ограничения допустимых значений
+ поля «Количество мест»: удаление из разметки соответствующих элементов option,
+ добавление элементам option состояния disabled или другие способы ограничения, например,
+ с помощью метода setCustomValidity.
+
+
+ */
