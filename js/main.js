@@ -96,7 +96,7 @@ let dataSource = getData();
 Отрисуйте сгенерированные DOM-элементы в блок .map__pins. Для вставки элементов используйте DocumentFragment.
 */
 
-let renderPins = function () {
+let renderPins = function () { // !сделать проверку на наличие пинов. сейчас дублируется
   let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
   let poolPins = document.querySelector(`.map__pins`);
   let fragment = document.createDocumentFragment();
@@ -137,31 +137,6 @@ let renderPins = function () {
 Если данных для заполнения не хватает, соответствующий блок в карточке скрывается.
 
 Вставьте полученный DOM-элемент в блок .map перед блоком.map__filters-container.
-
-<template id="card">
-    <article class="map__card popup">
-      <img src="img/avatars/user01.png" class="popup__avatar" width="70" height="70" alt="Аватар пользователя">
-      <button type="button" class="popup__close">Закрыть</button>
-      <h3 class="popup__title">Уютное гнездышко для молодоженов</h3>
-      <p class="popup__text popup__text--address">102-0082 Tōkyō-to, Chiyoda-ku, Ichibanchō, 14−3</p>
-      <p class="popup__text popup__text--price">5200₽<span>/ночь</span></p>
-      <h4 class="popup__type">Квартира</h4>
-      <p class="popup__text popup__text--capacity">2 комнаты для 3 гостей</p>
-      <p class="popup__text popup__text--time">Заезд после 14:00, выезд до 10:00</p>
-      <ul class="popup__features">
-        <li class="popup__feature popup__feature--wifi"></li>
-        <li class="popup__feature popup__feature--dishwasher"></li>
-        <li class="popup__feature popup__feature--parking"></li>
-        <li class="popup__feature popup__feature--washer"></li>
-        <li class="popup__feature popup__feature--elevator"></li>
-        <li class="popup__feature popup__feature--conditioner"></li>
-      </ul>
-      <p class="popup__description">Великолепная квартира-студия в центре Токио. Подходит как туристам, так и бизнесменам. Квартира полностью укомплектована и недавно отремонтирована.</p>
-      <div class="popup__photos">
-        <img src="" class="popup__photo" width="45" height="40" alt="Фотография жилья">
-      </div>
-    </article>
-  </template>
 */
 
 let setCardTitle = function (cardName, cardNumber) {
@@ -241,23 +216,38 @@ let setCardAvatar = function (cardName, cardNumber) {
 };
 
 let renderCard = function () {
-  for (let i = 0; i < 1; i++) { // по заданию ограничиваем до одного объявления
-    let templateCard = document.querySelector(`#card`).content;
-    let newCard = templateCard.cloneNode(true);
+  if (!document.querySelector(`.map__card`)) { // блокируем повторное открытие объявленя
+    for (let i = 0; i < 1; i++) { // по заданию ограничиваем до одного объявления
+      let templateCard = document.querySelector(`#card`).content;
+      let newCard = templateCard.cloneNode(true);
 
-    setCardTitle(newCard, i);
-    setCardAddress(newCard, i);
-    setCardPrice(newCard, i);
-    setCardType(newCard, i);
-    setCardCapacity(newCard, i);
-    setCardTime(newCard, i);
-    setCardFeatures(newCard, i);
-    setCardDescription(newCard, i);
-    setCardPhotos(newCard, i);
-    setCardAvatar(newCard, i);
-    map.appendChild(newCard);
+      setCardTitle(newCard, i);
+      setCardAddress(newCard, i);
+      setCardPrice(newCard, i);
+      setCardType(newCard, i);
+      setCardCapacity(newCard, i);
+      setCardTime(newCard, i);
+      setCardFeatures(newCard, i);
+      setCardDescription(newCard, i);
+      setCardPhotos(newCard, i);
+      setCardAvatar(newCard, i);
+      map.appendChild(newCard);
+    }
   }
 };
+
+//
+
+let renderOnlyCard = function () {
+  document.querySelector(`.map__pins`).addEventListener(function (evt) {
+    let cardId = evt.target.id;
+    let cardTarget = evt.target;
+
+  });
+};
+
+
+//
 
 /* Вешаем обработчики событий*/
 
@@ -307,6 +297,7 @@ if (mapFaded) {
   mapPin.addEventListener(`keydown`, function (evt) {
     if (evt.keyCode === 13) {
       adFormActicateAll();
+      setCurrentAddress();
     }
   });
 }
@@ -318,6 +309,7 @@ let adFormActicateAll = function () {
   renderCard();
   adFormEnable();
 };
+
 
 /* Валидация */
 
@@ -474,3 +466,15 @@ let setAllowedFiles = function () {
 setTypeDependencies();
 setGuestDependencies();
 setAllowedFiles();
+
+/* Открытие карточки объявления */
+
+/*
+Задача
+Доработайте проект так, чтобы пользователь мог открыть карточку любого доступного объявления;
+Добавьте возможность закрытия карточки с подробной информацией по нажатию клавиши Esc и клике по иконке закрытия;
+Добавьте поддержку открытия карточки объявления с клавиатуры. Карточка объявления для выбранной метки открывается при нажатии на клавишу Enter.
+Сделайте так, чтобы одновременно могла быть открыта только одна карточка объявления.
+*/
+
+
