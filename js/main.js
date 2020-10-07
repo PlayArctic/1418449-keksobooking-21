@@ -242,7 +242,6 @@ let renderOnlyCard = function () {
   document.querySelector(`.map__pins`).addEventListener(function (evt) {
     let cardId = evt.target.id;
     let cardTarget = evt.target;
-
   });
 };
 
