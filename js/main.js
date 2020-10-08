@@ -197,61 +197,55 @@ let setCardAvatar = function (cardName, cardNumber) {
   templateCardAvatar.src = dataSource[cardNumber].author.avatar;
 };
 
-// let renderCard = function (evt) {
-//   if (evt.target.dataset.id >= 0) {
-//     let templateCard = document.querySelector(`#card`).content;
-//     let newCard = templateCard.cloneNode(true);
-//     let id = evt.target.dataset.id;
+let renderCard = function (evt) {
+  if (evt.target.dataset.id) {
+    let templateCard = document.querySelector(`#card`).content;
+    let newCard = templateCard.cloneNode(true);
+    let id = evt.target.dataset.id;
 
-//     if (document.querySelector(`.map__card`)) { // удаляем предыдущее объявление
-//       document.querySelector(`.map__card`).remove();
-//     }
+    if (document.querySelector(`.map__card`)) { // удаляем предыдущее объявление
+      document.querySelector(`.map__card`).remove();
+    }
 
-//     setCardTitle(newCard, id);
-//     setCardAddress(newCard, id);
-//     setCardPrice(newCard, id);
-//     setCardType(newCard, id);
-//     setCardCapacity(newCard, id);
-//     setCardTime(newCard, id);
-//     setCardFeatures(newCard, id);
-//     setCardDescription(newCard, id);
-//     setCardPhotos(newCard, id);
-//     setCardAvatar(newCard, id);
-//     map.appendChild(newCard);
-//   }
-// };
+    setCardTitle(newCard, id);
+    setCardAddress(newCard, id);
+    setCardPrice(newCard, id);
+    setCardType(newCard, id);
+    setCardCapacity(newCard, id);
+    setCardTime(newCard, id);
+    setCardFeatures(newCard, id);
+    setCardDescription(newCard, id);
+    setCardPhotos(newCard, id);
+    setCardAvatar(newCard, id);
+    map.appendChild(newCard);
+  }
 
-let renderCard = function () {
+  if (document.querySelector(`.popup__close`)) {
+    document.querySelector(`.popup__close`).addEventListener(`click`, function () {
+      document.querySelector(`.map__card`).remove();
+    });
+  }
+};
+
+let setRenderedCardListeners = function () {
   document.querySelector(`.map__pins`).addEventListener(`click`, function (evt) {
-    // document.querySelector(`.map__pins`).addEventListener(`keydown`, function () {
-    //   if (evt.code === 13) {
-    //     renderCard(evt);
-    //   }
-    // });
+    renderCard(evt);
+  });
 
-    if (evt.target.dataset.id >= 0) {
-      let templateCard = document.querySelector(`#card`).content;
-      let newCard = templateCard.cloneNode(true);
-      let id = evt.target.dataset.id;
+  document.querySelector(`.map__pins`).addEventListener(`keydown`, function (evt) {
+    if (evt.code === 13) { // !evt.code срабатывает
+      renderCard(evt);
+    }
+  });
 
-      if (document.querySelector(`.map__card`)) { // удаляем предыдущее объявление
-        document.querySelector(`.map__card`).remove();
-      }
-
-      setCardTitle(newCard, id);
-      setCardAddress(newCard, id);
-      setCardPrice(newCard, id);
-      setCardType(newCard, id);
-      setCardCapacity(newCard, id);
-      setCardTime(newCard, id);
-      setCardFeatures(newCard, id);
-      setCardDescription(newCard, id);
-      setCardPhotos(newCard, id);
-      setCardAvatar(newCard, id);
-      map.appendChild(newCard);
+  document.addEventListener(`keydown`, function (evt) {
+    if (evt.keyCode === 27) { // !evt.code не срабатывает
+      document.querySelector(`.map__card`).remove();
     }
   });
 };
+
+setRenderedCardListeners();
 
 /* Вешаем обработчики событий*/
 
@@ -290,7 +284,7 @@ let setCurrentAddress = function () {
 
 adFormDisable();
 
-if (document.querySelector(`.map--faded`) !== `null`) { // !не срабатывает. просьба посмотреть почему
+if (document.querySelector(`.map--faded`) !== `null`) { // !не срабатывает
   mapPin.addEventListener(`mousedown`, function (evt) {
     if (evt.which === 1) {
       adFormActicateAll();
@@ -299,7 +293,7 @@ if (document.querySelector(`.map--faded`) !== `null`) { // !не срабаты�
   });
 
   mapPin.addEventListener(`keydown`, function (evt) {
-    if (evt.code === 13) {
+    if (evt.keyCode === 13) { // !evt.code не срабатывает
       adFormActicateAll();
       setCurrentAddress();
     }
