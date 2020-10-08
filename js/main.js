@@ -1,34 +1,13 @@
 'use strict';
 
 /* Готовим массив данных для загрузки на сайт */
-/* {
-  "author": {
-      "avatar": строка, адрес изображения вида img/avatars/user{{xx}}.png, где {{xx}} это число от 1 до 8 с ведущим нулём. Например, 01, 02 и т. д. Адреса изображений не повторяются
-  },
-  "offer": {
-      "title": строка, заголовок предложения
-      "address": строка, адрес предложения. Для простоты пусть пока представляет собой запись вида "{{location.x}}, {{location.y}}", например, "600, 350"
-      "price": число, стоимость
-      "type": строка с одним из четырёх фиксированных значений: palace, flat, house или bungalow
-      "rooms": число, количество комнат
-      "guests": число, количество гостей, которое можно разместить
-      "checkin": строка с одним из трёх фиксированных значений: 12:00, 13:00 или 14:00,
-      "checkout": строка с одним из трёх фиксированных значений: 12:00, 13:00 или 14:00
-      "features": массив строк случайной длины из ниже предложенных: "wifi", "dishwasher", "parking", "washer", "elevator", "conditioner",
-      "description": строка с описанием,
-      "photos": массив строк случайной длины, содержащий адреса фотографий "http://o0.github.io/assets/images/tokyo/hotel1.jpg", "http://o0.github.io/assets/images/tokyo/hotel2.jpg", "http://o0.github.io/assets/images/tokyo/hotel3.jpg"
-  },
-  "location": {
-      "x": случайное число, координата x метки на карте. Значение ограничено размерами блока, в котором перетаскивается метка.
-      "y": случайное число, координата y метки на карте от 130 до 630.
-  }
-}  */
+
 // eslint-disable-next-line object-curly-spacing
 const AVATAR = [{ avatar: `img/avatars/user01.png` }, { avatar: `img/avatars/user02.png` }, { avatar: `img/avatars/user03.png` }, { avatar: `img/avatars/user04.png` }, { avatar: `img/avatars/user05.png` }, { avatar: `img/avatars/user06.png` }, { avatar: `img/avatars/user07.png` }, { avatar: `img/avatars/user08.png` }];
 // eslint-disable-next-line object-curly-spacing
-const TYPE = [{ type: `palace` }, { type: `flat` }, { type: `house` }, { type: `bungalow` }];
-const CHECKIN = [`12:00`, `13:00`, `14:00`];
-const CHECKOUT = [`12:00`, `13:00`, `14:00`];
+const TYPES = [{ type: `palace` }, { type: `flat` }, { type: `house` }, { type: `bungalow` }];
+const CHECKIN_PERIODS = [`12:00`, `13:00`, `14:00`];
+const CHECKOUT_PERIODS = [`12:00`, `13:00`, `14:00`];
 const FEATURES = [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`];
 let map = document.querySelector(`.map`);
 
@@ -39,8 +18,6 @@ let getRandomNumber = function (min, max) {
 let getPhotoset = function (photos = 5) {
   let photoSet = [];
   for (let j = 0; j < getRandomNumber(1, photos); j++) {
-    /* let photo = `http://o0.github.io/assets/images/tokyo/hotel${j}.jpg`;
-    photoSet.push(photo); */
     photoSet.push(`http://o0.github.io/assets/images/tokyo/hotel${j}.jpg`);
   }
   return photoSet;
@@ -57,11 +34,11 @@ let getData = function () {
         "title": `Заголовок предложения ${i + 1}`,
         "address": `${getRandomNumber(0, 600)}, ${getRandomNumber(0, 350)}`,
         "price": `${getRandomNumber(1000, 50000)}`,
-        "type": TYPE[getRandomNumber(0, 3)],
+        "type": TYPES[getRandomNumber(0, 3)],
         "rooms": getRandomNumber(1, 4),
         "guests": getRandomNumber(1, 3),
-        "checkin": CHECKIN[getRandomNumber(0, 2)],
-        "checkout": CHECKOUT[getRandomNumber(0, 2)],
+        "checkin": CHECKIN_PERIODS[getRandomNumber(0, 2)],
+        "checkout": CHECKOUT_PERIODS[getRandomNumber(0, 2)],
         "features": FEATURES.slice(0, getRandomNumber(1, 5)),
         "description": `Строка с описанием ${i + 1}`,
         "photos": getPhotoset(),
@@ -69,8 +46,12 @@ let getData = function () {
       "location": {
         "x": getRandomNumber(130, 1200),
         "y": getRandomNumber(130, 630),
+      },
+      "adId": {
+        "id": i,
       }
     };
+
     adDataStorage.push(adData);
   }
   return adDataStorage;
@@ -86,12 +67,10 @@ let dataSource = getData();
 </button>
 </template>
 
-
 Координаты: style="left: {{location.x + смещение по X}}px; top: {{location.y + смещение по Y}}px;"
 У изображения метки укажите:
 Аватар: src="{{author.avatar}}"
 Альтернативный текст: alt="{{заголовок объявления}}"
-
 
 Отрисуйте сгенерированные DOM-элементы в блок .map__pins. Для вставки элементов используйте DocumentFragment.
 */
@@ -103,11 +82,14 @@ let renderPins = function () { // !сделать проверку на нали
 
   for (let i = 0; i < 8; i++) {
     let newPin = templatePinButton.cloneNode(true);
+    let avatarImg = newPin.querySelector(`img`);
+
+    newPin.setAttribute(`data-id`, dataSource[i].adId.id);
     newPin.style.left = (dataSource[i].location.x - 20) + `px`;
     newPin.style.top = (dataSource[i].location.y - 40) + `px`;
-    let avatarImg = newPin.querySelector(`img`);
     avatarImg.src = dataSource[i].author.avatar;
     avatarImg.alt = dataSource[i].offer.title;
+    avatarImg.setAttribute(`data-id`, i);
     fragment.appendChild(newPin);
   }
 
@@ -212,41 +194,35 @@ let setCardPhotos = function (cardName, cardNumber) {
 
 let setCardAvatar = function (cardName, cardNumber) {
   let templateCardAvatar = cardName.querySelector(`.popup__avatar`);
-  templateCardAvatar.style.src = dataSource[cardNumber].author.avatar;
+  templateCardAvatar.src = dataSource[cardNumber].author.avatar;
 };
+
 
 let renderCard = function () {
-  if (!document.querySelector(`.map__card`)) { // блокируем повторное открытие объявленя
-    for (let i = 0; i < 1; i++) { // по заданию ограничиваем до одного объявления
+  document.querySelector(`.map__pins`).addEventListener(`click`, function (evt) {
+    if (evt.target.dataset.id >= 0) {
       let templateCard = document.querySelector(`#card`).content;
       let newCard = templateCard.cloneNode(true);
+      let id = evt.target.dataset.id;
 
-      setCardTitle(newCard, i);
-      setCardAddress(newCard, i);
-      setCardPrice(newCard, i);
-      setCardType(newCard, i);
-      setCardCapacity(newCard, i);
-      setCardTime(newCard, i);
-      setCardFeatures(newCard, i);
-      setCardDescription(newCard, i);
-      setCardPhotos(newCard, i);
-      setCardAvatar(newCard, i);
+      if (document.querySelector(`.map__card`)) { // удаляем предыдущее объявление
+        document.querySelector(`.map__card`).remove();
+      };
+
+      setCardTitle(newCard, id);
+      setCardAddress(newCard, id);
+      setCardPrice(newCard, id);
+      setCardType(newCard, id);
+      setCardCapacity(newCard, id);
+      setCardTime(newCard, id);
+      setCardFeatures(newCard, id);
+      setCardDescription(newCard, id);
+      setCardPhotos(newCard, id);
+      setCardAvatar(newCard, id);
       map.appendChild(newCard);
     }
-  }
-};
-
-//
-
-let renderOnlyCard = function () {
-  document.querySelector(`.map__pins`).addEventListener(function (evt) {
-    let cardId = evt.target.id;
-    let cardTarget = evt.target;
   });
 };
-
-
-//
 
 /* Вешаем обработчики событий*/
 
@@ -285,7 +261,7 @@ let setCurrentAddress = function () {
 
 adFormDisable();
 
-if (mapFaded) {
+if (document.querySelector(`.map--faded`) !== `null`) { // !не срабатывает. просьба посмотреть почему
   mapPin.addEventListener(`mousedown`, function (evt) {
     if (evt.which === 1) {
       adFormActicateAll();
