@@ -1,34 +1,13 @@
 'use strict';
 
 /* Готовим массив данных для загрузки на сайт */
-/* {
-  "author": {
-      "avatar": строка, адрес изображения вида img/avatars/user{{xx}}.png, где {{xx}} это число от 1 до 8 с ведущим нулём. Например, 01, 02 и т. д. Адреса изображений не повторяются
-  },
-  "offer": {
-      "title": строка, заголовок предложения
-      "address": строка, адрес предложения. Для простоты пусть пока представляет собой запись вида "{{location.x}}, {{location.y}}", например, "600, 350"
-      "price": число, стоимость
-      "type": строка с одним из четырёх фиксированных значений: palace, flat, house или bungalow
-      "rooms": число, количество комнат
-      "guests": число, количество гостей, которое можно разместить
-      "checkin": строка с одним из трёх фиксированных значений: 12:00, 13:00 или 14:00,
-      "checkout": строка с одним из трёх фиксированных значений: 12:00, 13:00 или 14:00
-      "features": массив строк случайной длины из ниже предложенных: "wifi", "dishwasher", "parking", "washer", "elevator", "conditioner",
-      "description": строка с описанием,
-      "photos": массив строк случайной длины, содержащий адреса фотографий "http://o0.github.io/assets/images/tokyo/hotel1.jpg", "http://o0.github.io/assets/images/tokyo/hotel2.jpg", "http://o0.github.io/assets/images/tokyo/hotel3.jpg"
-  },
-  "location": {
-      "x": случайное число, координата x метки на карте. Значение ограничено размерами блока, в котором перетаскивается метка.
-      "y": случайное число, координата y метки на карте от 130 до 630.
-  }
-}  */
+
 // eslint-disable-next-line object-curly-spacing
 const AVATAR = [{ avatar: `img/avatars/user01.png` }, { avatar: `img/avatars/user02.png` }, { avatar: `img/avatars/user03.png` }, { avatar: `img/avatars/user04.png` }, { avatar: `img/avatars/user05.png` }, { avatar: `img/avatars/user06.png` }, { avatar: `img/avatars/user07.png` }, { avatar: `img/avatars/user08.png` }];
 // eslint-disable-next-line object-curly-spacing
-const TYPE = [{ type: `palace` }, { type: `flat` }, { type: `house` }, { type: `bungalow` }];
-const CHECKIN = [`12:00`, `13:00`, `14:00`];
-const CHECKOUT = [`12:00`, `13:00`, `14:00`];
+const TYPES = [{ type: `palace` }, { type: `flat` }, { type: `house` }, { type: `bungalow` }];
+const CHECKIN_PERIODS = [`12:00`, `13:00`, `14:00`];
+const CHECKOUT_PERIODS = [`12:00`, `13:00`, `14:00`];
 const FEATURES = [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`];
 let map = document.querySelector(`.map`);
 
@@ -39,8 +18,6 @@ let getRandomNumber = function (min, max) {
 let getPhotoset = function (photos = 5) {
   let photoSet = [];
   for (let j = 0; j < getRandomNumber(1, photos); j++) {
-    /* let photo = `http://o0.github.io/assets/images/tokyo/hotel${j}.jpg`;
-    photoSet.push(photo); */
     photoSet.push(`http://o0.github.io/assets/images/tokyo/hotel${j}.jpg`);
   }
   return photoSet;
@@ -57,11 +34,11 @@ let getData = function () {
         "title": `Заголовок предложения ${i + 1}`,
         "address": `${getRandomNumber(0, 600)}, ${getRandomNumber(0, 350)}`,
         "price": `${getRandomNumber(1000, 50000)}`,
-        "type": TYPE[getRandomNumber(0, 3)],
+        "type": TYPES[getRandomNumber(0, 3)],
         "rooms": getRandomNumber(1, 4),
         "guests": getRandomNumber(1, 3),
-        "checkin": CHECKIN[getRandomNumber(0, 2)],
-        "checkout": CHECKOUT[getRandomNumber(0, 2)],
+        "checkin": CHECKIN_PERIODS[getRandomNumber(0, 2)],
+        "checkout": CHECKOUT_PERIODS[getRandomNumber(0, 2)],
         "features": FEATURES.slice(0, getRandomNumber(1, 5)),
         "description": `Строка с описанием ${i + 1}`,
         "photos": getPhotoset(),
@@ -69,8 +46,12 @@ let getData = function () {
       "location": {
         "x": getRandomNumber(130, 1200),
         "y": getRandomNumber(130, 630),
+      },
+      "adId": {
+        "id": i,
       }
     };
+
     adDataStorage.push(adData);
   }
   return adDataStorage;
@@ -86,28 +67,29 @@ let dataSource = getData();
 </button>
 </template>
 
-
 Координаты: style="left: {{location.x + смещение по X}}px; top: {{location.y + смещение по Y}}px;"
 У изображения метки укажите:
 Аватар: src="{{author.avatar}}"
 Альтернативный текст: alt="{{заголовок объявления}}"
 
-
 Отрисуйте сгенерированные DOM-элементы в блок .map__pins. Для вставки элементов используйте DocumentFragment.
 */
 
-let renderPins = function () {
+let renderPins = function () { // !сделать проверку на наличие пинов. сейчас дублируется
   let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
   let poolPins = document.querySelector(`.map__pins`);
   let fragment = document.createDocumentFragment();
 
   for (let i = 0; i < 8; i++) {
     let newPin = templatePinButton.cloneNode(true);
+    let avatarImg = newPin.querySelector(`img`);
+
+    newPin.setAttribute(`data-id`, dataSource[i].adId.id);
     newPin.style.left = (dataSource[i].location.x - 20) + `px`;
     newPin.style.top = (dataSource[i].location.y - 40) + `px`;
-    let avatarImg = newPin.querySelector(`img`);
     avatarImg.src = dataSource[i].author.avatar;
     avatarImg.alt = dataSource[i].offer.title;
+    avatarImg.setAttribute(`data-id`, i);
     fragment.appendChild(newPin);
   }
 
@@ -137,31 +119,6 @@ let renderPins = function () {
 Если данных для заполнения не хватает, соответствующий блок в карточке скрывается.
 
 Вставьте полученный DOM-элемент в блок .map перед блоком.map__filters-container.
-
-<template id="card">
-    <article class="map__card popup">
-      <img src="img/avatars/user01.png" class="popup__avatar" width="70" height="70" alt="Аватар пользователя">
-      <button type="button" class="popup__close">Закрыть</button>
-      <h3 class="popup__title">Уютное гнездышко для молодоженов</h3>
-      <p class="popup__text popup__text--address">102-0082 Tōkyō-to, Chiyoda-ku, Ichibanchō, 14−3</p>
-      <p class="popup__text popup__text--price">5200₽<span>/ночь</span></p>
-      <h4 class="popup__type">Квартира</h4>
-      <p class="popup__text popup__text--capacity">2 комнаты для 3 гостей</p>
-      <p class="popup__text popup__text--time">Заезд после 14:00, выезд до 10:00</p>
-      <ul class="popup__features">
-        <li class="popup__feature popup__feature--wifi"></li>
-        <li class="popup__feature popup__feature--dishwasher"></li>
-        <li class="popup__feature popup__feature--parking"></li>
-        <li class="popup__feature popup__feature--washer"></li>
-        <li class="popup__feature popup__feature--elevator"></li>
-        <li class="popup__feature popup__feature--conditioner"></li>
-      </ul>
-      <p class="popup__description">Великолепная квартира-студия в центре Токио. Подходит как туристам, так и бизнесменам. Квартира полностью укомплектована и недавно отремонтирована.</p>
-      <div class="popup__photos">
-        <img src="" class="popup__photo" width="45" height="40" alt="Фотография жилья">
-      </div>
-    </article>
-  </template>
 */
 
 let setCardTitle = function (cardName, cardNumber) {
@@ -237,27 +194,58 @@ let setCardPhotos = function (cardName, cardNumber) {
 
 let setCardAvatar = function (cardName, cardNumber) {
   let templateCardAvatar = cardName.querySelector(`.popup__avatar`);
-  templateCardAvatar.style.src = dataSource[cardNumber].author.avatar;
+  templateCardAvatar.src = dataSource[cardNumber].author.avatar;
 };
 
-let renderCard = function () {
-  for (let i = 0; i < 1; i++) { // по заданию ограничиваем до одного объявления
+let renderCard = function (evt) {
+  if (evt.target.dataset.id) {
     let templateCard = document.querySelector(`#card`).content;
     let newCard = templateCard.cloneNode(true);
+    let id = evt.target.dataset.id;
 
-    setCardTitle(newCard, i);
-    setCardAddress(newCard, i);
-    setCardPrice(newCard, i);
-    setCardType(newCard, i);
-    setCardCapacity(newCard, i);
-    setCardTime(newCard, i);
-    setCardFeatures(newCard, i);
-    setCardDescription(newCard, i);
-    setCardPhotos(newCard, i);
-    setCardAvatar(newCard, i);
+    if (document.querySelector(`.map__card`)) { // удаляем предыдущее объявление
+      document.querySelector(`.map__card`).remove();
+    }
+
+    setCardTitle(newCard, id);
+    setCardAddress(newCard, id);
+    setCardPrice(newCard, id);
+    setCardType(newCard, id);
+    setCardCapacity(newCard, id);
+    setCardTime(newCard, id);
+    setCardFeatures(newCard, id);
+    setCardDescription(newCard, id);
+    setCardPhotos(newCard, id);
+    setCardAvatar(newCard, id);
     map.appendChild(newCard);
   }
+
+  if (document.querySelector(`.popup__close`)) {
+    document.querySelector(`.popup__close`).addEventListener(`click`, function () {
+      document.querySelector(`.map__card`).remove();
+    });
+  }
 };
+
+let setRenderedCardListeners = function () {
+  document.querySelector(`.map__pins`).addEventListener(`click`, function (evt) {
+    renderCard(evt);
+  });
+
+  document.querySelector(`.map__pins`).addEventListener(`keydown`, function (evt) {
+    if (evt.code === 13) { // !evt.code срабатывает
+      renderCard(evt);
+    }
+  });
+
+  document.addEventListener(`keydown`, function (evt) {
+    if (evt.keyCode === 27) { // !evt.code не срабатывает
+      document.querySelector(`.map__card`).remove();
+    }
+  });
+};
+
+setRenderedCardListeners();
 
 /* Вешаем обработчики событий*/
 
@@ -296,7 +284,7 @@ let setCurrentAddress = function () {
 
 adFormDisable();
 
-if (mapFaded) {
+if (document.querySelector(`.map--faded`) !== `null`) { // !не срабатывает
   mapPin.addEventListener(`mousedown`, function (evt) {
     if (evt.which === 1) {
       adFormActicateAll();
@@ -305,8 +293,9 @@ if (mapFaded) {
   });
 
   mapPin.addEventListener(`keydown`, function (evt) {
-    if (evt.keyCode === 13) {
+    if (evt.keyCode === 13) { // !evt.code не срабатывает
       adFormActicateAll();
+      setCurrentAddress();
     }
   });
 }
@@ -318,6 +307,7 @@ let adFormActicateAll = function () {
   renderCard();
   adFormEnable();
 };
+
 
 /* Валидация */
 
@@ -474,3 +464,15 @@ let setAllowedFiles = function () {
 setTypeDependencies();
 setGuestDependencies();
 setAllowedFiles();
+
+/* Открытие карточки объявления */
+
+/*
+Задача
+Доработайте проект так, чтобы пользователь мог открыть карточку любого доступного объявления;
+Добавьте возможность закрытия карточки с подробной информацией по нажатию клавиши Esc и клике по иконке закрытия;
+Добавьте поддержку открытия карточки объявления с клавиатуры. Карточка объявления для выбранной метки открывается при нажатии на клавишу Enter.
+Сделайте так, чтобы одновременно могла быть открыта только одна карточка объявления.
+*/
+
+
