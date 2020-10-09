@@ -84,4 +84,8 @@
     adFormEnable();
     window.dataCards.renderCard();
   };
+
+  window.dataListeners = {
+    setCurrentAddress
+  };
 })();
