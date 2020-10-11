@@ -28,8 +28,19 @@
         y: moveEvt.clientY
       };
 
-      pinHandle.style.top = (pinHandle.offsetTop - shift.y) + `px`; // тк pin на абсолюте, создаем сдвиг
-      pinHandle.style.left = (pinHandle.offsetLeft - shift.x) + `px`;
+      let checkerCoords = function (coord, min, max) {
+        coord = parseInt(coord, 10);
+
+        // eslint-disable-next-line no-nested-ternary
+        return coord > max // тернарный
+          ? max
+          : coord < min
+            ? min
+            : coord;
+      };
+
+      pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`; // тк pin на абсолюте, создаем сдвиг
+      pinHandle.style.left = checkerCoords((pinHandle.offsetLeft - shift.x), 0, 1130) + `px`;
       window.dataListeners.setCurrentAddress();
     };
 
@@ -39,7 +50,7 @@
       document.removeEventListener(`mousemove`, onMouseMove);
       document.removeEventListener(`mouseup`, onMouseUp);
 
-      if (dragged) { // в проекте не нужно. оставил для понимания логики
+      if (dragged) {
         let onClickPreventDefault = function (clickEvt) {
           clickEvt.preventDefault();
           pinHandle.removeEventListener(`click`, onClickPreventDefault);

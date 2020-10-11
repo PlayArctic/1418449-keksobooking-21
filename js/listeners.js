@@ -5,9 +5,7 @@
   /* Вешаем обработчики событий на карточку объявления*/
 
   let setRenderedCardListeners = function () {
-    document.querySelector(`.map__pins`).addEventListener(`click`, function (evt) {
-      window.dataCards.renderCard(evt);
-    });
+    document.querySelector(`.map__pins`).addEventListener(`click`, window.dataCards.renderCard); // !браузер автоматически передает параметр event
 
     document.querySelector(`.map__pins`).addEventListener(`keydown`, function (evt) {
       if (evt.code === `Enter`) {
@@ -61,21 +59,21 @@
 
   adFormDisable();
 
-  if (document.querySelector(`.map--faded`) !== `null`) { // !не срабатывает
-    mapPin.addEventListener(`mousedown`, function (evt) {
-      if (evt.which === 1) {
-        setCurrentAddress();
-        adFormActicateAll();
-      }
-    });
 
-    mapPin.addEventListener(`keydown`, function (evt) {
-      if (evt.code === `Enter`) {
-        setCurrentAddress();
-        adFormActicateAll();
-      }
-    });
-  }
+  mapPin.addEventListener(`mousedown`, function (evt) {
+    if (evt.which === 1 && document.querySelector(`.map--faded`)) {
+      setCurrentAddress();
+      adFormActicateAll();
+    }
+  });
+
+  mapPin.addEventListener(`keydown`, function (evt) {
+    if (evt.code === `Enter` && document.querySelector(`.map--faded`)) {
+      setCurrentAddress();
+      adFormActicateAll();
+    }
+  });
+
 
   let adFormActicateAll = function () {
     mapFaded.classList.remove(`map--faded`);
