@@ -106,27 +106,29 @@
   };
 
   let renderCard = function (evt) {
-    if (evt.target.dataset.id) {
-      let templateCard = document.querySelector(`#card`).content;
-      let newCard = templateCard.cloneNode(true);
-      let id = evt.target.dataset.id;
-
-      if (document.querySelector(`.map__card`)) { // удаляем предыдущее объявление
-        document.querySelector(`.map__card`).remove();
-      }
-
-      setCardTitle(newCard, id);
-      setCardAddress(newCard, id);
-      setCardPrice(newCard, id);
-      setCardType(newCard, id);
-      setCardCapacity(newCard, id);
-      setCardTime(newCard, id);
-      setCardFeatures(newCard, id);
-      setCardDescription(newCard, id);
-      setCardPhotos(newCard, id);
-      setCardAvatar(newCard, id);
-      map.appendChild(newCard);
+    if (!evt || !evt.target.dataset.id) { // вся ф-ция заканчивается после return - если не получаем evt или dataset.id
+      return;
     }
+
+    let templateCard = document.querySelector(`#card`).content;
+    let newCard = templateCard.cloneNode(true);
+    let id = evt.target.dataset.id;
+
+    if (document.querySelector(`.map__card`)) { // удаляем предыдущее объявление
+      document.querySelector(`.map__card`).remove();
+    }
+
+    setCardTitle(newCard, id);
+    setCardAddress(newCard, id);
+    setCardPrice(newCard, id);
+    setCardType(newCard, id);
+    setCardCapacity(newCard, id);
+    setCardTime(newCard, id);
+    setCardFeatures(newCard, id);
+    setCardDescription(newCard, id);
+    setCardPhotos(newCard, id);
+    setCardAvatar(newCard, id);
+    map.appendChild(newCard);
 
     if (document.querySelector(`.popup__close`)) {
       document.querySelector(`.popup__close`).addEventListener(`click`, function () {
