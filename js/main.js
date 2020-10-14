@@ -1,5 +1,8 @@
 'use strict';
 
-window.dataValidation.setTypeDependencies();
-window.dataValidation.setGuestDependencies();
-window.dataValidation.setAllowedFiles();
+(function () {
+  window.validation.setTypeDependencies();
+  window.validation.setGuestDependencies();
+  window.validation.setAllowedFiles();
+})();
+

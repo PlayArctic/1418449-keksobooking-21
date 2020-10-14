@@ -5,11 +5,11 @@
   /* Вешаем обработчики событий на карточку объявления*/
 
   let setRenderedCardListeners = function () {
-    document.querySelector(`.map__pins`).addEventListener(`click`, window.dataCards.renderCard); // !браузер автоматически передает параметр event
+    document.querySelector(`.map__pins`).addEventListener(`click`, window.card.renderCard); // браузер автоматически передает параметр event, т.к. он там есть
 
     document.querySelector(`.map__pins`).addEventListener(`keydown`, function (evt) {
       if (evt.code === `Enter`) {
-        window.dataCards.renderCard(evt);
+        window.card.renderCard(evt);
       }
     });
 
@@ -63,27 +63,27 @@
   mapPin.addEventListener(`mousedown`, function (evt) {
     if (evt.which === 1 && document.querySelector(`.map--faded`)) {
       setCurrentAddress();
-      adFormActicateAll();
+      adFormActivateAll();
     }
   });
 
   mapPin.addEventListener(`keydown`, function (evt) {
     if (evt.code === `Enter` && document.querySelector(`.map--faded`)) {
       setCurrentAddress();
-      adFormActicateAll();
+      adFormActivateAll();
     }
   });
 
 
-  let adFormActicateAll = function () {
+  let adFormActivateAll = function () {
     mapFaded.classList.remove(`map--faded`);
     mapAdFormDisabled.classList.remove(`ad-form--disabled`);
-    window.dataPins.renderPins();
+    window.loadData.getServerData(window.pin.renderPins); // т.о. запускаем ф-цию отрисовки коллбэком после получения 200 ответа с сервера
     adFormEnable();
-    window.dataCards.renderCard();
+    window.card.renderCard();
   };
 
-  window.dataListeners = {
+  window.listeners = {
     setCurrentAddress
   };
 })();
