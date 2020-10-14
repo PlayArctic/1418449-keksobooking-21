@@ -41,7 +41,7 @@
 
       pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`; // тк pin на абсолюте, создаем сдвиг
       pinHandle.style.left = checkerCoords((pinHandle.offsetLeft - shift.x), 0, 1130) + `px`;
-      window.dataListeners.setCurrentAddress();
+      window.listeners.setCurrentAddress();
     };
 
     let onMouseUp = function (upEvt) {

@@ -154,7 +154,7 @@
     document.querySelector(`#images`).setAttribute(`accept`, `image/png, image/jpeg`);
   };
 
-  window.dataValidation = {
+  window.validation = {
     setTypeDependencies,
     setGuestDependencies,
     setAllowedFiles

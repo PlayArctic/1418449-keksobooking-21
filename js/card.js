@@ -31,39 +31,39 @@
 
   let setCardTitle = function (cardName, cardNumber) {
     let templateCardtitle = cardName.querySelector(`.popup__title`);
-    templateCardtitle.textContent = window.dataService.dataSource[cardNumber].offer.title;
+    templateCardtitle.textContent = window.loadData.getData()[cardNumber].offer.title;
   };
 
   let setCardAddress = function (cardName, cardNumber) {
     let templateCardAddress = cardName.querySelector(`.popup__text--address`);
-    templateCardAddress.textContent = window.dataService.dataSource[cardNumber].offer.address;
+    templateCardAddress.textContent = window.loadData.getData()[cardNumber].offer.address;
   };
 
   let setCardPrice = function (cardName, cardNumber) {
     let templateCardPrice = cardName.querySelector(`.popup__text--price`);
     templateCardPrice.textContent = []; // обнуляем старые значения
-    templateCardPrice.innerHTML = (`${window.dataService.dataSource[cardNumber].offer.price}₽<span> /ночь</span>`);
+    templateCardPrice.innerHTML = (`${window.loadData.getData()[cardNumber].offer.price}₽<span> /ночь</span>`);
   };
 
   let setCardType = function (cardName, cardNumber) {
     let templateCardType = cardName.querySelector(`.popup__type`);
-    templateCardType.textContent = window.dataService.dataSource[cardNumber].offer.TYPE;
+    templateCardType.textContent = window.loadData.getData()[cardNumber].offer.TYPE;
   };
 
   let setCardCapacity = function (cardName, cardNumber) {
     let templateCardCapacity = cardName.querySelector(`.popup__text--capacity`);
-    templateCardCapacity.textContent = `${window.dataService.dataSource[cardNumber].offer.rooms} комнаты для ${window.dataService.dataSource[cardNumber].offer.guests} гостей`;
+    templateCardCapacity.textContent = `${window.loadData.getData()[cardNumber].offer.rooms} комнаты для ${window.loadData.getData()[cardNumber].offer.guests} гостей`;
   };
 
   let setCardTime = function (cardName, cardNumber) {
     let templateCardTime = cardName.querySelector(`.popup__text--time`);
-    templateCardTime.textContent = `Заезд после ${window.dataService.dataSource[cardNumber].offer.checkin}, выезд до ${window.dataService.dataSource[cardNumber].offer.checkout}`;
+    templateCardTime.textContent = `Заезд после ${window.loadData.getData()[cardNumber].offer.checkin}, выезд до ${window.loadData.getData()[cardNumber].offer.checkout}`;
   };
 
   let setCardFeatures = function (cardName, cardNumber) {
     let templateCardFeatures = cardName.querySelector(`.popup__features`);
     let fragmentsFeatures = document.createDocumentFragment();
-    let currentPoolFeatures = window.dataService.dataSource[cardNumber].offer.features;
+    let currentPoolFeatures = window.loadData.getData()[cardNumber].offer.features;
 
     for (let j = 0; j < currentPoolFeatures.length; j++) {
       let createElementFeature = document.createElement(`li`);
@@ -77,12 +77,12 @@
 
   let setCardDescription = function (cardName, cardNumber) {
     let templateCardDescription = cardName.querySelector(`.popup__description`);
-    templateCardDescription.textContent = window.dataService.dataSource[cardNumber].offer.description;
+    templateCardDescription.textContent = window.loadData.getData()[cardNumber].offer.description;
   };
 
   let setCardPhotos = function (cardName, cardNumber) {
     let fragmentsPhotos = document.createDocumentFragment();
-    let currentPoolPhotos = window.dataService.dataSource[cardNumber].offer.photos;
+    let currentPoolPhotos = window.loadData.getData()[cardNumber].offer.photos;
     let templateCardPhotos = cardName.querySelector(`.popup__photos`);
 
     for (let j = 0; j < currentPoolPhotos.length; j++) {
@@ -102,7 +102,7 @@
 
   let setCardAvatar = function (cardName, cardNumber) {
     let templateCardAvatar = cardName.querySelector(`.popup__avatar`);
-    templateCardAvatar.src = window.dataService.dataSource[cardNumber].author.avatar;
+    templateCardAvatar.src = window.loadData.getData()[cardNumber].author.avatar;
   };
 
   let renderCard = function (evt) {
@@ -137,7 +137,7 @@
     }
   };
 
-  window.dataCards = {
+  window.card = {
     renderCard,
   };
 
