@@ -90,7 +90,6 @@
       createElementPhoto.style.src = currentPoolPhotos[j];
       createElementPhoto.style.width = `45px`;
       createElementPhoto.style.height = `40px`;
-      /* createElementPhoto.setAttribute = (`alt`, `Фотография жилья`); // setAttribute это функция в которую нужно передавать параметры а не присваивать что-то*/
       createElementPhoto.alt = `Фотография жилья`;
       createElementPhoto.classList.add(`popup__photo`);
       fragmentsPhotos.appendChild(createElementPhoto);
