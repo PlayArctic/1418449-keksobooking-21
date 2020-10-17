@@ -26,21 +26,26 @@
     let xhr = new XMLHttpRequest();
 
     xhr.addEventListener(`load`, function () {
+      const SUCCESS_CODE = 200;
+      const WRONG_REQUEST_CODE = 400;
+      const NOT_AUTHORIZED_CODE = 401;
+      const NOT_FOUND_CODE = 404;
       let error;
+
       switch (xhr.status) {
-        case 200:
+        case SUCCESS_CODE:
           data = JSON.parse(xhr.responseText);
 
           afterSuccsessCallback(data);
           break;
 
-        case 400:
+        case WRONG_REQUEST_CODE:
           error = `Неверный запрос`;
           break;
-        case 401:
+        case NOT_AUTHORIZED_CODE:
           error = `Пользователь не авторизован`;
           break;
-        case 404:
+        case NOT_FOUND_CODE:
           error = `Ничего не найдено`;
           break;
 

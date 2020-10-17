@@ -14,7 +14,7 @@
     });
 
     document.addEventListener(`keydown`, function (evt) {
-      if (evt.code === `Escape`) {
+      if (evt.code === `Escape` && document.querySelector(`.map__card`)) {
         document.querySelector(`.map__card`).remove();
       }
     });
