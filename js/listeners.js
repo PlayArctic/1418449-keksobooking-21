@@ -78,7 +78,8 @@
   let adFormActivateAll = function () {
     mapFaded.classList.remove(`map--faded`);
     mapAdFormDisabled.classList.remove(`ad-form--disabled`);
-    window.loadData.getServerData(window.pin.renderPins); // т.о. запускаем ф-цию отрисовки коллбэком после получения 200 ответа с сервера
+    // window.loadData.getServerData(window.pin.renderPins); // т.о. запускаем ф-цию отрисовки коллбэком после получения 200 ответа с сервера
+    window.loadData.getServerData(window.filter.updateData);
     adFormEnable();
     window.card.renderCard();
   };

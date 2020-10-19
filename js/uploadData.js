@@ -43,7 +43,7 @@
       errorCallback(`Запрос не успел выполниться за ` + xhr.timeout + `мс`);
     });
 
-    xhr.timeout = 1;
+    xhr.timeout = 10000;
 
     xhr.open(`POST`, URL);
     xhr.send(data); // отправка данных data на сервер
