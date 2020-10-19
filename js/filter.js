@@ -1,8 +1,11 @@
 'use strict';
 
 (function () {
-  let filterType = document.querySelector(`#housing-type`);
   let currentFilterType = `flat`;
+  let currentFilterPrice = `middle`;
+  let currentFilterRoom = `1`;
+  let currentFilterGuest = `1`;
+  // let filteredData = [];
 
   const updateData = function () {
     let data = window.loadData.getData();
@@ -10,11 +13,11 @@
       return i.offer.type === currentFilterType;
     });
 
-    window.pin.renderPins(sameTypeAds); // .concat(data)
+    // filteredData = sameTypeAds;
+    window.pin.renderPins(sameTypeAds);
   };
 
-
-  filterType.addEventListener(`change`, function () {
+  document.querySelector(`.map__filters`).addEventListener(`change`, function (evt) {
     document.querySelectorAll(`button[data-id]`).forEach(function (pin) { // элементы button которые содержат атрибут data-id
       pin.remove();
     });
@@ -23,7 +26,22 @@
       document.querySelector(`.map__card`).remove();
     }
 
-    currentFilterType = filterType.value;
+    switch (evt.target.id) {
+      case `housing-type`:
+        currentFilterType = evt.target.value;
+        break;
+      case `housing-price`:
+        currentFilterPrice = evt.target.value;
+        break;
+      case `housing-rooms`:
+        currentFilterRoom = evt.target.value;
+        break;
+      case `housing-guests`:
+        currentFilterGuest = evt.target.value;
+        break;
+      default:
+        return;
+    }
 
     updateData();
   });
@@ -31,11 +49,4 @@
   window.filter = {
     updateData,
   };
-
 })();
-
-
-// let filterPrice = document.querySelector(`#housing-price`);
-// let filterRoom = document.querySelector(`#housing-rooms`);
-// let filterGuest = document.querySelector(`#housing-guests`);
-// let unFilteredData = window.loadData.getData();
