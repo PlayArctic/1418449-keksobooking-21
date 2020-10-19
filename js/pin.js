@@ -8,8 +8,9 @@
     let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
     let poolPins = document.querySelector(`.map__pins`);
     let fragment = document.createDocumentFragment();
+    const MAX_AD_QUANTITY = Math.min(data.length, 5);
 
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < MAX_AD_QUANTITY; i++) {
       let newPin = templatePinButton.cloneNode(true);
       let avatarImg = newPin.querySelector(`img`);
 

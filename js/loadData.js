@@ -35,7 +35,6 @@
       switch (xhr.status) {
         case SUCCESS_CODE:
           data = JSON.parse(xhr.responseText);
-
           afterSuccsessCallback(data);
           break;
 
