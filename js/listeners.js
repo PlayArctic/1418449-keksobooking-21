@@ -22,7 +22,7 @@
 
   setRenderedCardListeners();
 
-  /* Вешаем обработчики событий на Notice скуцию*/
+  /* Вешаем обработчики событий на Notice скцию*/
 
   let mapPin = document.querySelector(`.map__pin--main`);
   let mapFaded = document.querySelector(`.map--faded`);
