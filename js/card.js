@@ -2,68 +2,43 @@
 
 (function () {
 
-  /* Данные для отрисовки карточки */
-
-  /*
-  На основе первого по порядку элемента из сгенерированного массива и шаблона #card создайте DOM-элемент объявления (карточка объявления),
-  заполните его данными из объекта:
-
-  -Выведите заголовок объявления offer.title в заголовок .popup__title.
-  -Выведите адрес offer.address в блок .popup__text--address.
-  -Выведите цену offer.price в блок .popup__text--price строкой вида {{offer.price}}₽/ночь. Например, 5200₽/ночь.
-
-  -В блок .popup__type выведите тип жилья offer.type: Квартира для flat, Бунгало для bungalow, Дом для house, Дворец для palace.
-  -Выведите количество гостей и комнат offer.rooms и offer.guests в блок .popup__text--capacity строкой вида {{offer.rooms}} комнаты для {{offer.guests}} гостей.
-  Например, 2 комнаты для 3 гостей.
-  -Время заезда и выезда offer.checkin и offer.checkout в блок .popup__text--time строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}.
-  Например, заезд после 14:00, выезд до 12:00.
-  -В список .popup__features выведите все доступные удобства в объявлении.
-  -В блок .popup__description выведите описание объекта недвижимости offer.description.
-  -В блок .popup__photos выведите все фотографии из списка offer.photos. Каждая из строк массива photos должна записываться как src соответствующего изображения.
-  -Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
-
-  Если данных для заполнения не хватает, соответствующий блок в карточке скрывается.
-
-  Вставьте полученный DOM-элемент в блок .map перед блоком.map__filters-container.
-  */
-
   let map = document.querySelector(`.map`);
 
   let setCardTitle = function (cardName, cardNumber) {
     let templateCardtitle = cardName.querySelector(`.popup__title`);
-    templateCardtitle.textContent = window.loadData.getData()[cardNumber].offer.title;
+    templateCardtitle.textContent = window.filter.getFilteredAds()[cardNumber].offer.title;
   };
 
   let setCardAddress = function (cardName, cardNumber) {
     let templateCardAddress = cardName.querySelector(`.popup__text--address`);
-    templateCardAddress.textContent = window.loadData.getData()[cardNumber].offer.address;
+    templateCardAddress.textContent = window.filter.getFilteredAds()[cardNumber].offer.address;
   };
 
   let setCardPrice = function (cardName, cardNumber) {
     let templateCardPrice = cardName.querySelector(`.popup__text--price`);
     templateCardPrice.textContent = []; // обнуляем старые значения
-    templateCardPrice.innerHTML = (`${window.loadData.getData()[cardNumber].offer.price}₽<span> /ночь</span>`);
+    templateCardPrice.innerHTML = (`${window.filter.getFilteredAds()[cardNumber].offer.price}₽<span> /ночь</span>`);
   };
 
   let setCardType = function (cardName, cardNumber) {
     let templateCardType = cardName.querySelector(`.popup__type`);
-    templateCardType.textContent = window.loadData.getData()[cardNumber].offer.TYPE;
+    templateCardType.textContent = window.filter.getFilteredAds()[cardNumber].offer.TYPE;
   };
 
   let setCardCapacity = function (cardName, cardNumber) {
     let templateCardCapacity = cardName.querySelector(`.popup__text--capacity`);
-    templateCardCapacity.textContent = `${window.loadData.getData()[cardNumber].offer.rooms} комнаты для ${window.loadData.getData()[cardNumber].offer.guests} гостей`;
+    templateCardCapacity.textContent = `${window.filter.getFilteredAds()[cardNumber].offer.rooms} комнаты для ${window.filter.getFilteredAds()[cardNumber].offer.guests} гостей`;
   };
 
   let setCardTime = function (cardName, cardNumber) {
     let templateCardTime = cardName.querySelector(`.popup__text--time`);
-    templateCardTime.textContent = `Заезд после ${window.loadData.getData()[cardNumber].offer.checkin}, выезд до ${window.loadData.getData()[cardNumber].offer.checkout}`;
+    templateCardTime.textContent = `Заезд после ${window.filter.getFilteredAds()[cardNumber].offer.checkin}, выезд до ${window.filter.getFilteredAds()[cardNumber].offer.checkout}`;
   };
 
   let setCardFeatures = function (cardName, cardNumber) {
     let templateCardFeatures = cardName.querySelector(`.popup__features`);
     let fragmentsFeatures = document.createDocumentFragment();
-    let currentPoolFeatures = window.loadData.getData()[cardNumber].offer.features;
+    let currentPoolFeatures = window.filter.getFilteredAds()[cardNumber].offer.features;
 
     for (let j = 0; j < currentPoolFeatures.length; j++) {
       let createElementFeature = document.createElement(`li`);
@@ -77,12 +52,12 @@
 
   let setCardDescription = function (cardName, cardNumber) {
     let templateCardDescription = cardName.querySelector(`.popup__description`);
-    templateCardDescription.textContent = window.loadData.getData()[cardNumber].offer.description;
+    templateCardDescription.textContent = window.filter.getFilteredAds()[cardNumber].offer.description;
   };
 
   let setCardPhotos = function (cardName, cardNumber) {
     let fragmentsPhotos = document.createDocumentFragment();
-    let currentPoolPhotos = window.loadData.getData()[cardNumber].offer.photos;
+    let currentPoolPhotos = window.filter.getFilteredAds()[cardNumber].offer.photos;
     let templateCardPhotos = cardName.querySelector(`.popup__photos`);
 
     for (let j = 0; j < currentPoolPhotos.length; j++) {
@@ -101,7 +76,7 @@
 
   let setCardAvatar = function (cardName, cardNumber) {
     let templateCardAvatar = cardName.querySelector(`.popup__avatar`);
-    templateCardAvatar.src = window.loadData.getData()[cardNumber].author.avatar;
+    templateCardAvatar.src = window.filter.getFilteredAds()[cardNumber].author.avatar;
   };
 
   let renderCard = function (evt) {

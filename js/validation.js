@@ -29,7 +29,7 @@
 
 
   let adFormElement = document.querySelector(`#adForm`);
-  const ROOMS_TO_GUESTS_MAP = { // !прочитать про объект map
+  const ROOMS_TO_GUESTS_MAP = {
     '1': [`1`], //  js по умолчанию получает из html string
     '2': [`1`, `2`],
     '3': [`1`, `2`, `3`],
@@ -65,13 +65,13 @@
   let setTitleValidation = function (inputTarget) {
     inputTarget.addEventListener(`input`, function () {
       let valueLength = inputTarget.value.length;
-      // const MIN_NAME_LENGTH = 30; // так как значения не будут меняться, можно убрать const
-      // const MAX_NAME_LENGTH = 100;
+      const MIN_NAME_LENGTH = 30; // так как значения не будут меняться, можно убрать const
+      const MAX_NAME_LENGTH = 100;
 
-      if (valueLength < 30) {
-        inputTarget.setCustomValidity(`Еще ` + (30 - valueLength) + ` символов.`);
-      } else if (valueLength > 100) {
-        inputTarget.setCustomValidity(`Удалите лишние ` + (valueLength - 100) + ` символов.`);
+      if (valueLength < MIN_NAME_LENGTH) {
+        inputTarget.setCustomValidity(`Еще ` + (MIN_NAME_LENGTH - valueLength) + ` символов.`);
+      } else if (valueLength > MAX_NAME_LENGTH) {
+        inputTarget.setCustomValidity(`Удалите лишние ` + (valueLength - MAX_NAME_LENGTH) + ` символов.`);
       } else {
         inputTarget.setCustomValidity(``);
       }

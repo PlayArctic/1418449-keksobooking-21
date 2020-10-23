@@ -2,8 +2,6 @@
 
 (function () {
 
-  /* Отрисовываем Pins */
-
   let renderPins = function (data) {
     let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
     let poolPins = document.querySelector(`.map__pins`);
