@@ -3,6 +3,7 @@ const path = require("path"); // !что за конструкция
 
 module.exports = {
   entry: [
+    "./js/avatar.js",
     "./js/card.js",
     "./js/filter.js",
     "./js/listeners.js",
@@ -11,7 +12,8 @@ module.exports = {
     "./js/pin.js",
     "./js/pinMove.js",
     "./js/uploadData.js",
-    "./js/validation.js"
+    "./js/validation.js",
+    "./js/debounce.js",
   ],
   output: {
     filename: "bundle.js",

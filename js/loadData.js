@@ -7,7 +7,6 @@ let getData = function () {
 };
 
 let errorCallback = function (error) {
-  // eslint-disable-next-line no-console
   let node = document.createElement(`div`);
   node.style = `border-radius: 0 0 5px 5px; z-index: 100; margin: 0 auto; text-align: center; background-color: orange;`;
   node.style.position = `absolute`;

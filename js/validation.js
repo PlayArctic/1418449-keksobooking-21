@@ -126,11 +126,11 @@ let setAllowedFiles = function () {
   document.querySelector(`#images`).setAttribute(`accept`, `image/png, image/jpeg`);
 };
 
-// window.validation = {
-//   setTypeDependencies,
-//   setGuestDependencies,
-//   setAllowedFiles
-// };
+window.validation = {
+  setTypeDependencies,
+  setGuestDependencies,
+  setAllowedFiles
+};
 
 window.validation.setTypeDependencies();
 window.validation.setGuestDependencies();

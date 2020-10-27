@@ -65,6 +65,7 @@ let setCardPhotos = function (cardName, cardNumber) {
     createElementPhoto.style.height = `40px`;
     createElementPhoto.alt = `Фотография жилья`;
     createElementPhoto.classList.add(`popup__photo`);
+    createElementPhoto.src = currentPoolPhotos[j];
     fragmentsPhotos.appendChild(createElementPhoto);
   }
 
