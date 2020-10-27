@@ -7,7 +7,7 @@ let filters = {
   rooms: DEFAULT_FILTER_VALUE,
   guests: DEFAULT_FILTER_VALUE,
   features: {
-    wifi: false,
+    wifi: false, // !filter-wifi не катит
     dishwasher: false,
     parking: false,
     washer: false,
@@ -17,7 +17,7 @@ let filters = {
 };
 let filteredAds;
 
-let getFilteredAds = function () { // !без ф-ции window.filter.filteredAds возвращает пустой объект
+let getFilteredAds = function () { // !без ф-ции window.filter.getFilteredAds возвращает пустой объект
   return filteredAds;
 };
 

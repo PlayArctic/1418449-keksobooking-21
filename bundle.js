@@ -188,7 +188,7 @@ let filters = {
   rooms: DEFAULT_FILTER_VALUE,
   guests: DEFAULT_FILTER_VALUE,
   features: {
-    wifi: false,
+    wifi: false, // !filter-wifi не катит
     dishwasher: false,
     parking: false,
     washer: false,
@@ -198,7 +198,7 @@ let filters = {
 };
 let filteredAds;
 
-let getFilteredAds = function () { // !без ф-ции window.filter.filteredAds возвращает пустой объект
+let getFilteredAds = function () { // !без ф-ции window.filter.getFilteredAds возвращает пустой объект
   return filteredAds;
 };
 
@@ -333,9 +333,9 @@ let filterChangeCather = function () {
   });
 };
 
-let featuresToggler = function () {
+// let featuresToggler = function () {
 
-};
+// };
 
 filterChangeCather();
 
@@ -450,14 +450,12 @@ window.listeners = {
 /*! runtime requirements:  */
 
 
-let URL_LOAD_ADDRES = `https://21.javascript.pages.academy/keksobooking/data`;
 let data = [];
 let getData = function () {
   return data;
 };
 
-let errorCallback = function (error) {
-  // eslint-disable-next-line no-console
+let errorCallback = function (errorMessage) {
   let node = document.createElement(`div`);
   node.style = `border-radius: 0 0 5px 5px; z-index: 100; margin: 0 auto; text-align: center; background-color: orange;`;
   node.style.position = `absolute`;
@@ -465,59 +463,43 @@ let errorCallback = function (error) {
   node.style.right = 0;
   node.style.fontSize = `24px`;
   node.style.fontFamily = `Roboto`;
-
-  node.textContent = error;
+  node.textContent = errorMessage;
   document.body.insertAdjacentElement(`afterbegin`, node);
 };
 
-
 let getServerData = function (afterSuccsessCallback) {
-  let xhr = new XMLHttpRequest();
+  let URL_LOAD_ADDRES = `https://21.javascript.pages.academy/keksobooking/data`;
+  const WRONG_REQUEST_CODE = 400;
+  const NOT_AUTHORIZED_CODE = 401;
+  const NOT_FOUND_CODE = 404;
+  let error;
 
-  xhr.addEventListener(`load`, function () {
-    const SUCCESS_CODE = 200;
-    const WRONG_REQUEST_CODE = 400;
-    const NOT_AUTHORIZED_CODE = 401;
-    const NOT_FOUND_CODE = 404;
-    let error;
+  return fetch(URL_LOAD_ADDRES).
+  then(function (response) {
+    if (response.status >= 400) {
+      switch (response.status) {
+        case WRONG_REQUEST_CODE:
+          error = `Неверный запрос`;
+          break;
+        case NOT_AUTHORIZED_CODE:
+          error = `Пользователь не авторизован`;
+          break;
+        case NOT_FOUND_CODE:
+          error = `Ничего не найдено`;
+          break;
 
-    switch (xhr.status) {
-      case SUCCESS_CODE:
-        data = JSON.parse(xhr.responseText);
-        afterSuccsessCallback(data);
-        break;
+        default:
+          error = `Cтатус ответа: : ` + response.status + ` ` + response.statusText;
+      }
 
-      case WRONG_REQUEST_CODE:
-        error = `Неверный запрос`;
-        break;
-      case NOT_AUTHORIZED_CODE:
-        error = `Пользователь не авторизован`;
-        break;
-      case NOT_FOUND_CODE:
-        error = `Ничего не найдено`;
-        break;
-
-      default:
-        error = `Cтатус ответа: : ` + xhr.status + ` ` + xhr.statusText;
+      return errorCallback(error);
     }
 
-    if (error) {
-      errorCallback(error);
-    }
+    return response.json().then(function (clientData) {
+      data = clientData;
+      afterSuccsessCallback(clientData);
+    });
   });
-
-  xhr.addEventListener(`error`, function () {
-    errorCallback(`Произошла ошибка соединения`);
-  });
-
-  xhr.addEventListener(`timeout`, function () {
-    errorCallback(`Запрос не успел выполниться за ` + xhr.timeout + `мс`);
-  });
-
-  xhr.timeout = 10000;
-
-  xhr.open(`GET`, URL_LOAD_ADDRES);
-  xhr.send(); // в случае если загружаем с сервера то ничего не передаем
 };
 
 window.loadData = {
