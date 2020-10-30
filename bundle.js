@@ -15,7 +15,7 @@ let avatarPreview = document.querySelector(`.ad-form-header__preview img`);
 let adPhotoChooser = document.querySelector(`.ad-form__input`);
 let adPhotoPreview = document.querySelector(`.ad-form__photo`);
 
-let avatarSet = function (chooserInput, previewOutput) {
+let setAvatar = function (chooserInput, previewOutput) {
   chooserInput.addEventListener(`change`, function () {
     let file = chooserInput.files[0];
     let fileName = file.name.toLowerCase();
@@ -34,8 +34,9 @@ let avatarSet = function (chooserInput, previewOutput) {
           previewOutput.src = reader.result;
         } else {
           let newElement = document.createElement(`img`);
-          newElement.setAttribute(`style`, `border-radius: 5px; width: 100%; height: 100%;`);
           newElement.src = reader.result;
+
+          newElement.setAttribute(`style`, `border-radius: 5px; width: 100%; height: 100%;`);
           previewOutput.appendChild(newElement);
         }
 
@@ -44,8 +45,8 @@ let avatarSet = function (chooserInput, previewOutput) {
   });
 };
 
-avatarSet(avatarChooser, avatarPreview);
-avatarSet(adPhotoChooser, adPhotoPreview);
+setAvatar(avatarChooser, avatarPreview);
+setAvatar(adPhotoChooser, adPhotoPreview);
 
 })();
 
@@ -58,6 +59,7 @@ avatarSet(adPhotoChooser, adPhotoPreview);
 
 
 let map = document.querySelector(`.map`);
+
 
 let setCardTitle = function (cardName, cardNumber) {
   let templateCardtitle = cardName.querySelector(`.popup__title`);
@@ -97,11 +99,13 @@ let setCardFeatures = function (cardName, cardNumber) {
 
   for (let j = 0; j < currentPoolFeatures.length; j++) {
     let createElementFeature = document.createElement(`li`);
+
     createElementFeature.classList.add(`popup__feature`, `popup__feature--${currentPoolFeatures[j]}`);
     fragmentsFeatures.appendChild(createElementFeature);
   }
 
   templateCardFeatures.textContent = []; // обнуляем старые значения
+
   templateCardFeatures.appendChild(fragmentsFeatures);
 };
 
@@ -121,12 +125,14 @@ let setCardPhotos = function (cardName, cardNumber) {
     createElementPhoto.style.width = `45px`;
     createElementPhoto.style.height = `40px`;
     createElementPhoto.alt = `Фотография жилья`;
-    createElementPhoto.classList.add(`popup__photo`);
     createElementPhoto.src = currentPoolPhotos[j];
+
+    createElementPhoto.classList.add(`popup__photo`);
     fragmentsPhotos.appendChild(createElementPhoto);
   }
 
   templateCardPhotos.textContent = []; // обнуляем старые значения
+
   templateCardPhotos.appendChild(fragmentsPhotos);
 };
 
@@ -136,17 +142,19 @@ let setCardAvatar = function (cardName, cardNumber) {
 };
 
 let renderCard = function (evt) {
-  if (!evt || !evt.target.dataset.id) { // вся ф-ция заканчивается после return - если не получаем evt или dataset.id
+  let mapCard = document.querySelector(`.map__card`);
+
+  if (!evt || !evt.target.dataset.id) { // вся ф-ция заканчивается после return - если не получаем evt или dataset.id (id это начинка dataset)
     return;
+  }
+
+  if (mapCard) { // удаляем предыдущее объявление
+    mapCard.remove();
   }
 
   let templateCard = document.querySelector(`#card`).content;
   let newCard = templateCard.cloneNode(true);
   let id = evt.target.dataset.id;
-
-  if (document.querySelector(`.map__card`)) { // удаляем предыдущее объявление
-    document.querySelector(`.map__card`).remove();
-  }
 
   setCardTitle(newCard, id);
   setCardAddress(newCard, id);
@@ -158,13 +166,19 @@ let renderCard = function (evt) {
   setCardDescription(newCard, id);
   setCardPhotos(newCard, id);
   setCardAvatar(newCard, id);
+
   map.appendChild(newCard);
 
-  if (document.querySelector(`.popup__close`)) {
-    document.querySelector(`.popup__close`).addEventListener(`click`, function () {
-      document.querySelector(`.map__card`).remove();
-    });
-  }
+  setCardCloseListener();
+};
+
+let setCardCloseListener = function () {
+  let popupCloseButton = document.querySelector(`.popup__close`);
+  let popupCard = document.querySelector(`.map__card`);
+
+  popupCloseButton.addEventListener(`click`, function () {
+    popupCard.remove();
+  });
 };
 
 window.card = {
@@ -181,14 +195,14 @@ window.card = {
 /*! runtime requirements:  */
 
 
-let DEFAULT_FILTER_VALUE = `any`;
+const DEFAULT_FILTER_VALUE = `any`;
 let filters = {
   type: DEFAULT_FILTER_VALUE,
   price: DEFAULT_FILTER_VALUE,
   rooms: DEFAULT_FILTER_VALUE,
   guests: DEFAULT_FILTER_VALUE,
   features: {
-    wifi: false, // !filter-wifi не катит
+    wifi: false,
     dishwasher: false,
     parking: false,
     washer: false,
@@ -196,13 +210,14 @@ let filters = {
     conditioner: false,
   },
 };
+
 let filteredAds;
 
-let getFilteredAds = function () { // !без ф-ции window.filter.getFilteredAds возвращает пустой объект
+let getFilteredAds = function () {
   return filteredAds;
 };
 
-let featureChecker = function (item) {
+let featureChecker = function (item) { // !логика для несклольких filters.feature сразу
   for (let featureKey in filters.features) {
     if (filters.features[featureKey] && !item.offer.features.includes(featureKey)) { // если значение true но его нет в features item'a то сразу false
       return false;
@@ -212,33 +227,15 @@ let featureChecker = function (item) {
   return true;
 };
 
-// let priceMap = {
-//   low: {min: `< 0`, max: `< 10000`},
-//   middle: {min: `>= 10000`, max: `<= 50000`},
-//   high: {min: `> 50000`, max: `< 1000000`},
-// };
+let priceMap = {
+  low: {min: 0, max: 10000},
+  middle: {min: 9999, max: 50001},
+  high: {min: 50000, max: 1000000},
+};
 
-// let filterPrice = function (item) {
-//   for (let priceLevel in priceMap) {
-//     if (item.offer.price > priceLevel.min && item.offer.price < priceLevel.min) {
-//       return true;
-//     }
-//   }
-
-//   return false;
-// };
-
-let filterPrice = function (item) {
-  let textPrice;
-  if (item.offer.price < 10000) {
-    textPrice = `low`;
-  } else if (item.offer.price > 10000 && item.offer.price < 50000) {
-    textPrice = `middle`;
-  } else if (item.offer.price > 50000) {
-    textPrice = `high`;
-  }
-
-  return filters.price === DEFAULT_FILTER_VALUE || filters.price === textPrice;
+let filterPrice = function (item) { // !!!
+  return filters.price === DEFAULT_FILTER_VALUE
+    || item.offer.price > priceMap[filters.price].min && item.offer.price < priceMap[filters.price].max;
 };
 
 let filterType = function (item) {
@@ -254,11 +251,10 @@ let filterGuests = function (item) {
 };
 
 const updateData = function () {
-  filteredAds = window.loadData.getData().filter(function (item) {
-    // фильтр возвращает новый массив return которых будет true
+  filteredAds = window.loadData.getData().filter(function (item) { // фильтр возвращает новый массив return которых будет true
     return filterPrice(item) && filterType(item) && filterRooms(item) && filterGuests(item) && featureChecker(item);
   });
-  window.debounce.debounceFix(window.pin.renderPins(filteredAds));
+  window.pin.renderPins(filteredAds);
 };
 
 
@@ -285,159 +281,24 @@ let filterChangeCather = function () {
       case `housing-guests`:
         filters.guests = evt.target.value;
         break;
-      case `filter-wifi`:
-        if (filters.features.wifi === false) {
-          filters.features.wifi = true;
-        } else {
-          filters.features.wifi = false;
+      case evt.target.value :
+
+        if (evt.target.value in filters.features) {
+          filters.features[evt.target.value] = !filters.features[evt.target.value]; // .substring(evt.target.id.indexOf(`-`), evt.target.id.length)]
         }
-        break;
-      case `filter-dishwasher`:
-        if (filters.features.dishwasher === false) {
-          filters.features.dishwasher = true;
-        } else {
-          filters.features.dishwasher = false;
-        }
-        break;
-      case `filter-parking`:
-        if (filters.features.parking === false) {
-          filters.features.parking = true;
-        } else {
-          filters.features.parking = false;
-        }
-        break;
-      case `filter-washer`:
-        if (filters.features.washer === false) {
-          filters.features.washer = true;
-        } else {
-          filters.features.washer = false;
-        }
-        break;
-      case `filter-elevator`:
-        if (filters.features.elevator === false) {
-          filters.features.elevator = true;
-        } else {
-          filters.features.elevator = false;
-        }
-        break;
-      case `filter-conditioner`:
-        if (filters.features.conditioner === false) {
-          filters.features.conditioner = true;
-        } else {
-          filters.features.conditioner = false;
-        }
+
         break;
     }
 
-    updateData();
+    window.debounce.fixDebounce(updateData); // передаем невызванную ф-цию updateData а не updateData(). до этого был результат вызова ф-ции в связи с чем вылетала ошибка
   });
 };
-
-// let featuresToggler = function () {
-
-// };
 
 filterChangeCather();
 
 window.filter = {
   updateData,
   getFilteredAds,
-};
-
-})();
-
-(() => {
-/*!*************************!*\
-  !*** ./js/listeners.js ***!
-  \*************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements:  */
-
-
-/* Вешаем обработчики событий на карточку объявления*/
-
-let setRenderedCardListeners = function () {
-  document.querySelector(`.map__pins`).addEventListener(`click`, window.card.renderCard); // браузер автоматически передает параметр event, т.к. он там есть
-
-  document.querySelector(`.map__pins`).addEventListener(`keydown`, function (evt) {
-    if (evt.code === `Enter`) {
-      window.card.renderCard(evt);
-    }
-  });
-
-  document.addEventListener(`keydown`, function (evt) {
-    if (evt.code === `Escape` && document.querySelector(`.map__card`)) {
-      document.querySelector(`.map__card`).remove();
-    }
-  });
-};
-
-setRenderedCardListeners();
-
-/* Вешаем обработчики событий на Notice скцию*/
-
-let mapPin = document.querySelector(`.map__pin--main`);
-let mapFaded = document.querySelector(`.map--faded`);
-let mapFilters = document.querySelectorAll(`.map__filter`);
-let mapFeaures = document.querySelector(`.map__features`);
-let mapAdFormDisabled = document.querySelector(`.ad-form--disabled`);
-let adFormAll = document.querySelectorAll(`.ad-form__element`);
-let currentAddress = document.querySelector(`#address`);
-
-let adFormDisable = function () {
-  for (let i of adFormAll) {
-    i.setAttribute(`disabled`, `disabled`);
-  }
-  for (let i of mapFilters) {
-    i.setAttribute(`disabled`, `disabled`);
-  }
-  mapFeaures.setAttribute(`disabled`, `disabled`);
-};
-
-let adFormEnable = function () {
-  for (let i of adFormAll) {
-    i.removeAttribute(`disabled`);
-  }
-  for (let i of mapFilters) {
-    i.removeAttribute(`disabled`);
-  }
-  mapFeaures.removeAttribute(`disabled`);
-};
-
-let setCurrentAddress = function () {
-  currentAddress.value = (`${mapPin.style.left.replace(/px/, ``) - 32}, ${mapPin.style.top.replace(/px/, ``) - 62}`);
-  currentAddress.setAttribute(`readonly`, `readonly`);
-};
-
-adFormDisable();
-
-
-mapPin.addEventListener(`mousedown`, function (evt) {
-  if (evt.which === 1 && document.querySelector(`.map--faded`)) {
-    setCurrentAddress();
-    adFormActivateAll();
-  }
-});
-
-mapPin.addEventListener(`keydown`, function (evt) {
-  if (evt.code === `Enter` && document.querySelector(`.map--faded`)) {
-    setCurrentAddress();
-    adFormActivateAll();
-  }
-});
-
-
-let adFormActivateAll = function () {
-  mapFaded.classList.remove(`map--faded`);
-  mapAdFormDisabled.classList.remove(`ad-form--disabled`);
-  // window.loadData.getServerData(window.pin.renderPins); // т.о. запускаем ф-цию отрисовки коллбэком после получения 200 ответа с сервера
-  window.loadData.getServerData(window.filter.updateData);
-  adFormEnable();
-  window.card.renderCard();
-};
-
-window.listeners = {
-  setCurrentAddress
 };
 
 })();
@@ -464,7 +325,7 @@ let errorCallback = function (errorMessage) {
   node.style.fontSize = `24px`;
   node.style.fontFamily = `Roboto`;
   node.textContent = errorMessage;
-  document.body.insertAdjacentElement(`afterbegin`, node);
+  document.body.appendChild(node);
 };
 
 let getServerData = function (afterSuccsessCallback) {
@@ -474,32 +335,33 @@ let getServerData = function (afterSuccsessCallback) {
   const NOT_FOUND_CODE = 404;
   let error;
 
-  return fetch(URL_LOAD_ADDRES).
-  then(function (response) {
-    if (response.status >= 400) {
-      switch (response.status) {
-        case WRONG_REQUEST_CODE:
-          error = `Неверный запрос`;
-          break;
-        case NOT_AUTHORIZED_CODE:
-          error = `Пользователь не авторизован`;
-          break;
-        case NOT_FOUND_CODE:
-          error = `Ничего не найдено`;
-          break;
+  return fetch(URL_LOAD_ADDRES)
+    .then(function (response) {
+      if (response.status >= 400) {
+        switch (response.status) {
+          case WRONG_REQUEST_CODE:
+            error = `Неверный запрос`;
+            break;
+          case NOT_AUTHORIZED_CODE:
+            error = `Пользователь не авторизован`;
+            break;
+          case NOT_FOUND_CODE:
+            error = `Ничего не найдено`;
+            break;
 
-        default:
-          error = `Cтатус ответа: : ` + response.status + ` ` + response.statusText;
+          default:
+            error = `Cтатус ответа: : ` + response.status + ` ` + response.statusText;
+        }
+
+        return errorCallback(error);
       }
 
-      return errorCallback(error);
-    }
-
-    return response.json().then(function (clientData) {
-      data = clientData;
-      afterSuccsessCallback(clientData);
+      return response.json()
+        .then(function (clientData) {
+          data = clientData.filter((item) => item.offer); // оставляем только те что содержат item.offer
+          afterSuccsessCallback(data);
+        });
     });
-  });
 };
 
 window.loadData = {
@@ -510,12 +372,116 @@ window.loadData = {
 })();
 
 (() => {
-/*!********************!*\
-  !*** ./js/main.js ***!
-  \********************/
+/*!*************************!*\
+  !*** ./js/listeners.js ***!
+  \*************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements:  */
 
+
+/* Вешаем обработчики событий на карточку объявления*/
+
+let setRenderedCardListeners = function () {
+  document.querySelector(`.map__pins`).addEventListener(`click`, window.card.renderCard); // браузер автоматически передает параметр event, т.к. он там есть. и автоматом когда срабатывает обработчик вызывает ф-цию
+
+  document.querySelector(`.map__pins`).addEventListener(`keydown`, function (evt) {
+    if (evt.code === `Enter`) {
+      window.card.renderCard(evt);
+    }
+  });
+
+  document.addEventListener(`keydown`, function (evt) {
+    if (evt.code === `Escape` && document.querySelector(`.map__card`)) {
+      document.querySelector(`.map__card`).remove();
+    }
+  });
+};
+
+setRenderedCardListeners();
+
+/* Вешаем обработчики событий на Notice скцию*/
+
+let mapPin = document.querySelector(`.map__pin--main`);
+let mapFaded = document.querySelector(`.map--faded`);
+let map = document.querySelector(`.map`);
+let mapFilters = document.querySelectorAll(`.map__filter`);
+let mapFeaures = document.querySelector(`.map__features`);
+let adForm = document.querySelector(`.ad-form`);
+let mapAdFormDisabled = document.querySelector(`.ad-form--disabled`);
+let adFormAll = document.querySelectorAll(`.ad-form__element`);
+let currentAddress = document.querySelector(`#address`);
+let resetButton = document.querySelector(`.ad-form__reset`);
+
+
+let adFormDisable = function () {
+  for (let feature of adFormAll) {
+    feature.setAttribute(`disabled`, `disabled`);
+  }
+  for (let feature of mapFilters) {
+    feature.setAttribute(`disabled`, `disabled`);
+  }
+
+  mapFeaures.setAttribute(`disabled`, `disabled`);
+};
+
+let adFormEnable = function () {
+  for (let feature of adFormAll) {
+    feature.removeAttribute(`disabled`);
+  }
+  for (let feature of mapFilters) {
+    feature.removeAttribute(`disabled`);
+  }
+
+  mapFeaures.removeAttribute(`disabled`);
+};
+
+let setCurrentAddress = function () {
+  currentAddress.value = (`${mapPin.style.left.replace(/px/, ``) - 32}, ${mapPin.style.top.replace(/px/, ``) - 62}`);
+  currentAddress.setAttribute(`readonly`, `readonly`);
+};
+
+adFormDisable();
+
+let activateAllAdForm = function () {
+  mapFaded.classList.remove(`map--faded`);
+  mapAdFormDisabled.classList.remove(`ad-form--disabled`);
+  // window.loadData.getServerData(window.pin.renderPins); // т.о. запускаем ф-цию отрисовки коллбэком после получения 200 ответа с сервера
+  window.loadData.getServerData(window.filter.updateData);
+  adFormEnable();
+  window.card.renderCard();
+};
+
+let deactivateAllAdForm = function () {
+  adForm.reset();
+  adForm.classList.add(`ad-form--disabled`);
+  map.classList.add(`map--faded`);
+  document.querySelectorAll(`.map__pin[type=button]`).forEach(function (node) {
+    node.remove();
+  });
+  mapPin.style.left = `570px`;
+  mapPin.style.top = `375px`;
+};
+
+mapPin.addEventListener(`mousedown`, function (evt) {
+  if (evt.which === 1 && document.querySelector(`.map--faded`)) {
+    setCurrentAddress();
+    activateAllAdForm();
+  }
+});
+
+mapPin.addEventListener(`keydown`, function (evt) {
+  if (evt.code === `Enter` && document.querySelector(`.map--faded`)) {
+    setCurrentAddress();
+    activateAllAdForm();
+  }
+});
+
+resetButton.addEventListener(`click`, deactivateAllAdForm);
+
+window.listeners = {
+  setCurrentAddress,
+  deactivateAllAdForm
+};
 
 })();
 
@@ -532,18 +498,20 @@ let renderPins = function (data) {
   let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
   let poolPins = document.querySelector(`.map__pins`);
   let fragment = document.createDocumentFragment();
-  const MAX_AD_QUANTITY = Math.min(data.length, 5);
+  let maxAdQuantity = Math.min(data.length, 5);
 
-  for (let i = 0; i < MAX_AD_QUANTITY; i++) {
+  for (let pinNum = 0; pinNum < maxAdQuantity; pinNum++) {
     let newPin = templatePinButton.cloneNode(true);
     let avatarImg = newPin.querySelector(`img`);
 
-    newPin.setAttribute(`data-id`, i);
-    newPin.style.left = (data[i].location.x - 20) + `px`;
-    newPin.style.top = (data[i].location.y - 40) + `px`;
-    avatarImg.src = data[i].author.avatar;
-    avatarImg.alt = data[i].offer.title;
-    avatarImg.setAttribute(`data-id`, i);
+    newPin.setAttribute(`data-id`, pinNum); // логический блок
+
+    newPin.style.left = (data[pinNum].location.x - 20) + `px`; // логический блок
+    newPin.style.top = (data[pinNum].location.y - 40) + `px`;
+    avatarImg.src = data[pinNum].author.avatar;
+    avatarImg.alt = data[pinNum].offer.title;
+
+    avatarImg.setAttribute(`data-id`, pinNum); // логический блок
     fragment.appendChild(newPin);
   }
 
@@ -594,12 +562,21 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
     let checkerCoords = function (coord, min, max) {
       coord = parseInt(coord, 10);
 
-      // eslint-disable-next-line no-nested-ternary
-      return coord > max // тернарный
-        ? max
-        : coord < min
-          ? min
-          : coord;
+      if (coord > max) {
+        return max;
+      } else {
+        if (coord < min) {
+          return min;
+        }
+
+        return coord;
+      }
+
+      // return coord > max
+      //   ? max
+      //   : coord < min
+      //     ? min
+      //     : coord;
     };
 
     pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`; // тк pin на абсолюте, создаем сдвиг
@@ -641,7 +618,7 @@ let URL_UPLOAD_ADDRES = `https://21.javascript.pages.academy/keksobooking`;
 
 let uploadData = function (data) { // data это то что передаем на сервер, см. ниже
   let xhr = new XMLHttpRequest();
-  xhr.responseType = `json`; // !зачем это тут
+  xhr.responseType = `json`;
 
   xhr.addEventListener(`load`, function () {
     const SUCCESS_CODE = 200;
@@ -693,7 +670,7 @@ let onSuccessSendCallback = function () {
   document.body.insertAdjacentElement(`afterbegin`, newNode);
 
   document.querySelector(`.overlay`).addEventListener(`click`, function () {
-    this.remove(); // работает, но линтеру не нравится
+    this.remove(); // !работает, но линтеру не нравится
   });
 
   document.addEventListener(`keydown`, function (evt) {
@@ -703,8 +680,7 @@ let onSuccessSendCallback = function () {
   });
 };
 
-let errorCallback = function (error) { // !выделить в функцию
-  // eslint-disable-next-line no-console
+let errorCallback = function (error) {
   let node = document.querySelector(`#error`).content;
   let newNode = node.cloneNode(true);
 
@@ -733,7 +709,8 @@ let errorCallback = function (error) { // !выделить в функцию
 let form = document.querySelector(`#adForm`);
 form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
-  uploadData((new FormData(form)));
+  uploadData((new FormData(form))); // !!!
+  window.listeners.deactivateAllAdForm();
 });
 
 window.upload = {
@@ -820,40 +797,55 @@ let setTypeDependencies = function () {
   let priceElement = document.querySelector(`#price`);
   let typeElement = document.querySelector(`#type`);
 
-  if (typeElement.value === `bungalow`) {
-    priceElement.setAttribute(`min`, `0`);
-    priceElement.setAttribute(`placeholder`, `0`);
-  } else if (typeElement.value === `flat`) {
-    priceElement.setAttribute(`min`, `1000`);
-    priceElement.setAttribute(`placeholder`, `1000`);
-  } else if (typeElement.value === `house`) {
-    priceElement.setAttribute(`min`, `5000`);
-    priceElement.setAttribute(`placeholder`, `5000`);
-  } else if (typeElement.value === `palace`) {
-    priceElement.setAttribute(`min`, `10000`);
-    priceElement.setAttribute(`placeholder`, `10000`);
+  switch (typeElement.value) {
+    case `bungalow`:
+      priceElement.setAttribute(`min`, `0`);
+      priceElement.setAttribute(`placeholder`, `0`);
+      break;
+    case `flat`:
+      priceElement.setAttribute(`min`, `1000`);
+      priceElement.setAttribute(`placeholder`, `1000`);
+      break;
+    case `house`:
+      priceElement.setAttribute(`min`, `5000`);
+      priceElement.setAttribute(`placeholder`, `5000`);
+      break;
+    case `palace`:
+      priceElement.setAttribute(`min`, `10000`);
+      priceElement.setAttribute(`placeholder`, `10000`);
+      break;
   }
 };
 
 let setTimeInDependencies = function (inputTarget) {
   let timeOut = document.querySelector(`#timeout`);
-  if (inputTarget.value === `12:00`) {
-    timeOut.value = `12:00`;
-  } else if (inputTarget.value === `13:00`) {
-    timeOut.value = `13:00`;
-  } else if (inputTarget.value === `14:00`) {
-    timeOut.value = `14:00`;
+
+  switch (inputTarget.value) {
+    case `12:00`:
+      timeOut.value = `12:00`;
+      break;
+    case `13:00`:
+      timeOut.value = `13:00`;
+      break;
+    case `14:00`:
+      timeOut.value = `14:00`;
+      break;
   }
 };
 
 let setTimeOutDependencies = function (inputTarget) {
   let timeIn = document.querySelector(`#timein`);
-  if (inputTarget.value === `12:00`) {
-    timeIn.value = `12:00`;
-  } else if (inputTarget.value === `13:00`) {
-    timeIn.value = `13:00`;
-  } else if (inputTarget.value === `14:00`) {
-    timeIn.value = `14:00`;
+
+  switch (inputTarget.value) {
+    case `12:00`:
+      timeIn.value = `12:00`;
+      break;
+    case `13:00`:
+      timeIn.value = `13:00`;
+      break;
+    case `14:00`:
+      timeIn.value = `14:00`;
+      break;
   }
 };
 
@@ -864,10 +856,10 @@ let setGuestDependencies = function () {
     if (ROOMS_TO_GUESTS_MAP[roomsCount].includes(option.value)) {
       option.removeAttribute(`disabled`);
       option.setAttribute(`selected`, ``);
-    } else {
-      option.setAttribute(`disabled`, ``);
-      option.removeAttribute(`selected`);
     }
+
+    option.setAttribute(`disabled`, ``);
+    option.removeAttribute(`selected`);
   });
 };
 
@@ -896,10 +888,10 @@ window.validation.setAllowedFiles();
 /*! runtime requirements:  */
 
 
-const DEBOUNCE_INTERVAL = 900; // ms
+const DEBOUNCE_INTERVAL = 300; // ms
 
 let lastTimeout;
-let debounceFix = function (cb) {
+let fixDebounce = function (cb) {
 //  debugger;
   if (lastTimeout) {
     window.clearTimeout(lastTimeout); // пока не выполнено это действия все остальные действия будут откидываться (п2)
@@ -909,7 +901,7 @@ let debounceFix = function (cb) {
 };
 
 window.debounce = {
-  debounceFix,
+  fixDebounce,
 };
 
 })();

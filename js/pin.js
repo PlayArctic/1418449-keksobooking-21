@@ -5,18 +5,20 @@ let renderPins = function (data) {
   let templatePinButton = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
   let poolPins = document.querySelector(`.map__pins`);
   let fragment = document.createDocumentFragment();
-  const MAX_AD_QUANTITY = Math.min(data.length, 5);
+  let maxAdQuantity = Math.min(data.length, 5);
 
-  for (let i = 0; i < MAX_AD_QUANTITY; i++) {
+  for (let pinNum = 0; pinNum < maxAdQuantity; pinNum++) {
     let newPin = templatePinButton.cloneNode(true);
     let avatarImg = newPin.querySelector(`img`);
 
-    newPin.setAttribute(`data-id`, i);
-    newPin.style.left = (data[i].location.x - 20) + `px`;
-    newPin.style.top = (data[i].location.y - 40) + `px`;
-    avatarImg.src = data[i].author.avatar;
-    avatarImg.alt = data[i].offer.title;
-    avatarImg.setAttribute(`data-id`, i);
+    newPin.setAttribute(`data-id`, pinNum); // логический блок
+
+    newPin.style.left = (data[pinNum].location.x - 20) + `px`; // логический блок
+    newPin.style.top = (data[pinNum].location.y - 40) + `px`;
+    avatarImg.src = data[pinNum].author.avatar;
+    avatarImg.alt = data[pinNum].offer.title;
+
+    avatarImg.setAttribute(`data-id`, pinNum); // логический блок
     fragment.appendChild(newPin);
   }
 

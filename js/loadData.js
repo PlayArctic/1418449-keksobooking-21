@@ -14,7 +14,7 @@ let errorCallback = function (errorMessage) {
   node.style.fontSize = `24px`;
   node.style.fontFamily = `Roboto`;
   node.textContent = errorMessage;
-  document.body.insertAdjacentElement(`afterbegin`, node);
+  document.body.appendChild(node);
 };
 
 let getServerData = function (afterSuccsessCallback) {
@@ -24,32 +24,33 @@ let getServerData = function (afterSuccsessCallback) {
   const NOT_FOUND_CODE = 404;
   let error;
 
-  return fetch(URL_LOAD_ADDRES).
-  then(function (response) {
-    if (response.status >= 400) {
-      switch (response.status) {
-        case WRONG_REQUEST_CODE:
-          error = `Неверный запрос`;
-          break;
-        case NOT_AUTHORIZED_CODE:
-          error = `Пользователь не авторизован`;
-          break;
-        case NOT_FOUND_CODE:
-          error = `Ничего не найдено`;
-          break;
+  return fetch(URL_LOAD_ADDRES)
+    .then(function (response) {
+      if (response.status >= 400) {
+        switch (response.status) {
+          case WRONG_REQUEST_CODE:
+            error = `Неверный запрос`;
+            break;
+          case NOT_AUTHORIZED_CODE:
+            error = `Пользователь не авторизован`;
+            break;
+          case NOT_FOUND_CODE:
+            error = `Ничего не найдено`;
+            break;
 
-        default:
-          error = `Cтатус ответа: : ` + response.status + ` ` + response.statusText;
+          default:
+            error = `Cтатус ответа: : ` + response.status + ` ` + response.statusText;
+        }
+
+        return errorCallback(error);
       }
 
-      return errorCallback(error);
-    }
-
-    return response.json().then(function (clientData) {
-      data = clientData;
-      afterSuccsessCallback(clientData);
+      return response.json()
+        .then(function (clientData) {
+          data = clientData.filter((item) => item.offer); // оставляем только те что содержат item.offer
+          afterSuccsessCallback(data);
+        });
     });
-  });
 };
 
 window.loadData = {

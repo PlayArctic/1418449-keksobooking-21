@@ -1,9 +1,9 @@
 'use strict';
 
-const DEBOUNCE_INTERVAL = 900; // ms
+const DEBOUNCE_INTERVAL = 300; // ms
 
 let lastTimeout;
-let debounceFix = function (cb) {
+let fixDebounce = function (cb) {
 //  debugger;
   if (lastTimeout) {
     window.clearTimeout(lastTimeout); // пока не выполнено это действия все остальные действия будут откидываться (п2)
@@ -13,5 +13,5 @@ let debounceFix = function (cb) {
 };
 
 window.debounce = {
-  debounceFix,
+  fixDebounce,
 };

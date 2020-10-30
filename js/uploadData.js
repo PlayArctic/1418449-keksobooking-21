@@ -3,7 +3,7 @@ let URL_UPLOAD_ADDRES = `https://21.javascript.pages.academy/keksobooking`;
 
 let uploadData = function (data) { // data это то что передаем на сервер, см. ниже
   let xhr = new XMLHttpRequest();
-  xhr.responseType = `json`; // !зачем это тут
+  xhr.responseType = `json`;
 
   xhr.addEventListener(`load`, function () {
     const SUCCESS_CODE = 200;
@@ -55,7 +55,7 @@ let onSuccessSendCallback = function () {
   document.body.insertAdjacentElement(`afterbegin`, newNode);
 
   document.querySelector(`.overlay`).addEventListener(`click`, function () {
-    this.remove(); // работает, но линтеру не нравится
+    document.querySelector(`.overlay`).remove();
   });
 
   document.addEventListener(`keydown`, function (evt) {
@@ -65,8 +65,7 @@ let onSuccessSendCallback = function () {
   });
 };
 
-let errorCallback = function (error) { // !выделить в функцию
-  // eslint-disable-next-line no-console
+let errorCallback = function (error) {
   let node = document.querySelector(`#error`).content;
   let newNode = node.cloneNode(true);
 
@@ -75,7 +74,7 @@ let errorCallback = function (error) { // !выделить в функцию
   document.body.appendChild(newNode); // document.body.insertAdjacentElement(`afterbegin`, newNode); не сработало
 
   document.querySelector(`.overlay`).addEventListener(`click`, function () {
-    this.remove(); // !работает, но линтеру не нравится
+    document.querySelector(`.overlay`).remove();
   });
 
   document.addEventListener(`keydown`, function (evt) {
@@ -95,7 +94,8 @@ let errorCallback = function (error) { // !выделить в функцию
 let form = document.querySelector(`#adForm`);
 form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
-  uploadData((new FormData(form)));
+  uploadData((new FormData(form))); // FormData автоматически считывает поля из form
+  window.listeners.deactivateAllAdForm();
 });
 
 window.upload = {

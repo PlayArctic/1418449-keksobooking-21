@@ -70,40 +70,55 @@ let setTypeDependencies = function () {
   let priceElement = document.querySelector(`#price`);
   let typeElement = document.querySelector(`#type`);
 
-  if (typeElement.value === `bungalow`) {
-    priceElement.setAttribute(`min`, `0`);
-    priceElement.setAttribute(`placeholder`, `0`);
-  } else if (typeElement.value === `flat`) {
-    priceElement.setAttribute(`min`, `1000`);
-    priceElement.setAttribute(`placeholder`, `1000`);
-  } else if (typeElement.value === `house`) {
-    priceElement.setAttribute(`min`, `5000`);
-    priceElement.setAttribute(`placeholder`, `5000`);
-  } else if (typeElement.value === `palace`) {
-    priceElement.setAttribute(`min`, `10000`);
-    priceElement.setAttribute(`placeholder`, `10000`);
+  switch (typeElement.value) {
+    case `bungalow`:
+      priceElement.setAttribute(`min`, `0`);
+      priceElement.setAttribute(`placeholder`, `0`);
+      break;
+    case `flat`:
+      priceElement.setAttribute(`min`, `1000`);
+      priceElement.setAttribute(`placeholder`, `1000`);
+      break;
+    case `house`:
+      priceElement.setAttribute(`min`, `5000`);
+      priceElement.setAttribute(`placeholder`, `5000`);
+      break;
+    case `palace`:
+      priceElement.setAttribute(`min`, `10000`);
+      priceElement.setAttribute(`placeholder`, `10000`);
+      break;
   }
 };
 
 let setTimeInDependencies = function (inputTarget) {
   let timeOut = document.querySelector(`#timeout`);
-  if (inputTarget.value === `12:00`) {
-    timeOut.value = `12:00`;
-  } else if (inputTarget.value === `13:00`) {
-    timeOut.value = `13:00`;
-  } else if (inputTarget.value === `14:00`) {
-    timeOut.value = `14:00`;
+
+  switch (inputTarget.value) {
+    case `12:00`:
+      timeOut.value = `12:00`;
+      break;
+    case `13:00`:
+      timeOut.value = `13:00`;
+      break;
+    case `14:00`:
+      timeOut.value = `14:00`;
+      break;
   }
 };
 
 let setTimeOutDependencies = function (inputTarget) {
   let timeIn = document.querySelector(`#timein`);
-  if (inputTarget.value === `12:00`) {
-    timeIn.value = `12:00`;
-  } else if (inputTarget.value === `13:00`) {
-    timeIn.value = `13:00`;
-  } else if (inputTarget.value === `14:00`) {
-    timeIn.value = `14:00`;
+
+  switch (inputTarget.value) {
+    case `12:00`:
+      timeIn.value = `12:00`;
+      break;
+    case `13:00`:
+      timeIn.value = `13:00`;
+      break;
+    case `14:00`:
+      timeIn.value = `14:00`;
+      break;
   }
 };
 
@@ -114,10 +129,10 @@ let setGuestDependencies = function () {
     if (ROOMS_TO_GUESTS_MAP[roomsCount].includes(option.value)) {
       option.removeAttribute(`disabled`);
       option.setAttribute(`selected`, ``);
-    } else {
-      option.setAttribute(`disabled`, ``);
-      option.removeAttribute(`selected`);
     }
+
+    option.setAttribute(`disabled`, ``);
+    option.removeAttribute(`selected`);
   });
 };
 

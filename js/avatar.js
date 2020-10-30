@@ -7,7 +7,7 @@ let avatarPreview = document.querySelector(`.ad-form-header__preview img`);
 let adPhotoChooser = document.querySelector(`.ad-form__input`);
 let adPhotoPreview = document.querySelector(`.ad-form__photo`);
 
-let avatarSet = function (chooserInput, previewOutput) {
+let setAvatar = function (chooserInput, previewOutput) {
   chooserInput.addEventListener(`change`, function () {
     let file = chooserInput.files[0];
     let fileName = file.name.toLowerCase();
@@ -26,8 +26,9 @@ let avatarSet = function (chooserInput, previewOutput) {
           previewOutput.src = reader.result;
         } else {
           let newElement = document.createElement(`img`);
-          newElement.setAttribute(`style`, `border-radius: 5px; width: 100%; height: 100%;`);
           newElement.src = reader.result;
+
+          newElement.setAttribute(`style`, `border-radius: 5px; width: 100%; height: 100%;`);
           previewOutput.appendChild(newElement);
         }
 
@@ -36,5 +37,5 @@ let avatarSet = function (chooserInput, previewOutput) {
   });
 };
 
-avatarSet(avatarChooser, avatarPreview);
-avatarSet(adPhotoChooser, adPhotoPreview);
+setAvatar(avatarChooser, avatarPreview);
+setAvatar(adPhotoChooser, adPhotoPreview);

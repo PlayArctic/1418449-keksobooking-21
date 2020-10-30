@@ -29,12 +29,21 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
     let checkerCoords = function (coord, min, max) {
       coord = parseInt(coord, 10);
 
-      // eslint-disable-next-line no-nested-ternary
-      return coord > max // тернарный
-        ? max
-        : coord < min
-          ? min
-          : coord;
+      if (coord > max) {
+        return max;
+      } else {
+        if (coord < min) {
+          return min;
+        }
+
+        return coord;
+      }
+
+      // return coord > max
+      //   ? max
+      //   : coord < min
+      //     ? min
+      //     : coord;
     };
 
     pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`; // тк pin на абсолюте, создаем сдвиг

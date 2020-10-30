@@ -1,13 +1,13 @@
 'use strict';
 
-let DEFAULT_FILTER_VALUE = `any`;
+const DEFAULT_FILTER_VALUE = `any`;
 let filters = {
   type: DEFAULT_FILTER_VALUE,
   price: DEFAULT_FILTER_VALUE,
   rooms: DEFAULT_FILTER_VALUE,
   guests: DEFAULT_FILTER_VALUE,
   features: {
-    wifi: false, // !filter-wifi не катит
+    wifi: false,
     dishwasher: false,
     parking: false,
     washer: false,
@@ -15,13 +15,14 @@ let filters = {
     conditioner: false,
   },
 };
+
 let filteredAds;
 
-let getFilteredAds = function () { // !без ф-ции window.filter.getFilteredAds возвращает пустой объект
+let getFilteredAds = function () {
   return filteredAds;
 };
 
-let featureChecker = function (item) {
+let featureChecker = function (item) { // !логика для несклольких filters.feature сразу
   for (let featureKey in filters.features) {
     if (filters.features[featureKey] && !item.offer.features.includes(featureKey)) { // если значение true но его нет в features item'a то сразу false
       return false;
@@ -31,33 +32,15 @@ let featureChecker = function (item) {
   return true;
 };
 
-// let priceMap = {
-//   low: {min: `< 0`, max: `< 10000`},
-//   middle: {min: `>= 10000`, max: `<= 50000`},
-//   high: {min: `> 50000`, max: `< 1000000`},
-// };
+let priceMap = {
+  low: {min: 0, max: 10000},
+  middle: {min: 9999, max: 50001},
+  high: {min: 50000, max: 1000000},
+};
 
-// let filterPrice = function (item) {
-//   for (let priceLevel in priceMap) {
-//     if (item.offer.price > priceLevel.min && item.offer.price < priceLevel.min) {
-//       return true;
-//     }
-//   }
-
-//   return false;
-// };
-
-let filterPrice = function (item) {
-  let textPrice;
-  if (item.offer.price < 10000) {
-    textPrice = `low`;
-  } else if (item.offer.price > 10000 && item.offer.price < 50000) {
-    textPrice = `middle`;
-  } else if (item.offer.price > 50000) {
-    textPrice = `high`;
-  }
-
-  return filters.price === DEFAULT_FILTER_VALUE || filters.price === textPrice;
+let filterPrice = function (item) { // !!!
+  return filters.price === DEFAULT_FILTER_VALUE
+    || item.offer.price > priceMap[filters.price].min && item.offer.price < priceMap[filters.price].max;
 };
 
 let filterType = function (item) {
@@ -73,11 +56,10 @@ let filterGuests = function (item) {
 };
 
 const updateData = function () {
-  filteredAds = window.loadData.getData().filter(function (item) {
-    // фильтр возвращает новый массив return которых будет true
+  filteredAds = window.loadData.getData().filter(function (item) { // фильтр возвращает новый массив return которых будет true
     return filterPrice(item) && filterType(item) && filterRooms(item) && filterGuests(item) && featureChecker(item);
   });
-  window.debounce.debounceFix(window.pin.renderPins(filteredAds));
+  window.pin.renderPins(filteredAds);
 };
 
 
@@ -104,57 +86,18 @@ let filterChangeCather = function () {
       case `housing-guests`:
         filters.guests = evt.target.value;
         break;
-      case `filter-wifi`:
-        if (filters.features.wifi === false) {
-          filters.features.wifi = true;
-        } else {
-          filters.features.wifi = false;
+      case evt.target.value :
+
+        if (evt.target.value in filters.features) {
+          filters.features[evt.target.value] = !filters.features[evt.target.value]; // .substring(evt.target.id.indexOf(`-`), evt.target.id.length)]
         }
-        break;
-      case `filter-dishwasher`:
-        if (filters.features.dishwasher === false) {
-          filters.features.dishwasher = true;
-        } else {
-          filters.features.dishwasher = false;
-        }
-        break;
-      case `filter-parking`:
-        if (filters.features.parking === false) {
-          filters.features.parking = true;
-        } else {
-          filters.features.parking = false;
-        }
-        break;
-      case `filter-washer`:
-        if (filters.features.washer === false) {
-          filters.features.washer = true;
-        } else {
-          filters.features.washer = false;
-        }
-        break;
-      case `filter-elevator`:
-        if (filters.features.elevator === false) {
-          filters.features.elevator = true;
-        } else {
-          filters.features.elevator = false;
-        }
-        break;
-      case `filter-conditioner`:
-        if (filters.features.conditioner === false) {
-          filters.features.conditioner = true;
-        } else {
-          filters.features.conditioner = false;
-        }
+
         break;
     }
 
-    updateData();
+    window.debounce.fixDebounce(updateData); // передаем невызванную ф-цию updateData а не updateData(). до этого был результат вызова ф-ции в связи с чем вылетала ошибка
   });
 };
-
-// let featuresToggler = function () {
-
-// };
 
 filterChangeCather();
 

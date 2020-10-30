@@ -2,6 +2,7 @@
 
 let map = document.querySelector(`.map`);
 
+
 let setCardTitle = function (cardName, cardNumber) {
   let templateCardtitle = cardName.querySelector(`.popup__title`);
   templateCardtitle.textContent = window.filter.getFilteredAds()[cardNumber].offer.title;
@@ -40,11 +41,13 @@ let setCardFeatures = function (cardName, cardNumber) {
 
   for (let j = 0; j < currentPoolFeatures.length; j++) {
     let createElementFeature = document.createElement(`li`);
+
     createElementFeature.classList.add(`popup__feature`, `popup__feature--${currentPoolFeatures[j]}`);
     fragmentsFeatures.appendChild(createElementFeature);
   }
 
   templateCardFeatures.textContent = []; // обнуляем старые значения
+
   templateCardFeatures.appendChild(fragmentsFeatures);
 };
 
@@ -64,12 +67,14 @@ let setCardPhotos = function (cardName, cardNumber) {
     createElementPhoto.style.width = `45px`;
     createElementPhoto.style.height = `40px`;
     createElementPhoto.alt = `Фотография жилья`;
-    createElementPhoto.classList.add(`popup__photo`);
     createElementPhoto.src = currentPoolPhotos[j];
+
+    createElementPhoto.classList.add(`popup__photo`);
     fragmentsPhotos.appendChild(createElementPhoto);
   }
 
   templateCardPhotos.textContent = []; // обнуляем старые значения
+
   templateCardPhotos.appendChild(fragmentsPhotos);
 };
 
@@ -79,17 +84,19 @@ let setCardAvatar = function (cardName, cardNumber) {
 };
 
 let renderCard = function (evt) {
-  if (!evt || !evt.target.dataset.id) { // вся ф-ция заканчивается после return - если не получаем evt или dataset.id
+  let mapCard = document.querySelector(`.map__card`);
+
+  if (!evt || !evt.target.dataset.id) { // вся ф-ция заканчивается после return - если не получаем evt или dataset.id (id это начинка dataset)
     return;
+  }
+
+  if (mapCard) { // удаляем предыдущее объявление
+    mapCard.remove();
   }
 
   let templateCard = document.querySelector(`#card`).content;
   let newCard = templateCard.cloneNode(true);
   let id = evt.target.dataset.id;
-
-  if (document.querySelector(`.map__card`)) { // удаляем предыдущее объявление
-    document.querySelector(`.map__card`).remove();
-  }
 
   setCardTitle(newCard, id);
   setCardAddress(newCard, id);
@@ -101,13 +108,19 @@ let renderCard = function (evt) {
   setCardDescription(newCard, id);
   setCardPhotos(newCard, id);
   setCardAvatar(newCard, id);
+
   map.appendChild(newCard);
 
-  if (document.querySelector(`.popup__close`)) {
-    document.querySelector(`.popup__close`).addEventListener(`click`, function () {
-      document.querySelector(`.map__card`).remove();
-    });
-  }
+  setCardCloseListener();
+};
+
+let setCardCloseListener = function () {
+  let popupCloseButton = document.querySelector(`.popup__close`);
+  let popupCard = document.querySelector(`.map__card`);
+
+  popupCloseButton.addEventListener(`click`, function () {
+    popupCard.remove();
+  });
 };
 
 window.card = {
