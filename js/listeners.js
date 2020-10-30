@@ -33,7 +33,6 @@ let adFormAll = document.querySelectorAll(`.ad-form__element`);
 let currentAddress = document.querySelector(`#address`);
 let resetButton = document.querySelector(`.ad-form__reset`);
 
-
 let adFormDisable = function () {
   for (let feature of adFormAll) {
     feature.setAttribute(`disabled`, `disabled`);
