@@ -1,12 +1,13 @@
 'use strict';
 
-let adFormElement = document.querySelector(`#adForm`);
 const ROOMS_TO_GUESTS_MAP = {
   '1': [`1`], //  js по умолчанию получает из html string
   '2': [`1`, `2`],
   '3': [`1`, `2`, `3`],
   '100': [`0`] // вынесено за скобки чтобы каждый раз не собирался объект внутри функции
 };
+
+let adFormElement = document.querySelector(`#adForm`);
 
 adFormElement.addEventListener(`input`, function (evt) { // общий обработчик на form (делегирование событий)
   let inputId = evt.target.id;
@@ -36,9 +37,10 @@ adFormElement.addEventListener(`input`, function (evt) { // общий обра�
 
 let setTitleValidation = function (inputTarget) {
   inputTarget.addEventListener(`input`, function () {
-    let valueLength = inputTarget.value.length;
-    const MIN_NAME_LENGTH = 30; // так как значения не будут меняться, можно убрать const
+    const MIN_NAME_LENGTH = 30;
     const MAX_NAME_LENGTH = 100;
+
+    let valueLength = inputTarget.value.length;
 
     if (valueLength < MIN_NAME_LENGTH) {
       inputTarget.setCustomValidity(`Еще ` + (MIN_NAME_LENGTH - valueLength) + ` символов.`);
@@ -123,16 +125,14 @@ let setTimeOutDependencies = function (inputTarget) {
 };
 
 let setGuestDependencies = function () {
-  let roomsCount = document.querySelector(`#room_number`).value;
-
   Array.from(document.querySelector(`#capacity`).options).forEach(function (option) {
-    if (ROOMS_TO_GUESTS_MAP[roomsCount].includes(option.value)) {
+    if (ROOMS_TO_GUESTS_MAP[document.querySelector(`#room_number`).value].includes(option.value)) {
       option.removeAttribute(`disabled`);
       option.setAttribute(`selected`, ``);
+    } else {
+      option.setAttribute(`disabled`, ``);
+      option.removeAttribute(`selected`);
     }
-
-    option.setAttribute(`disabled`, ``);
-    option.removeAttribute(`selected`);
   });
 };
 

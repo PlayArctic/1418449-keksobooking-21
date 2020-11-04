@@ -2,30 +2,34 @@
 
 let map = document.querySelector(`.map`);
 
-
 let setCardTitle = function (cardName, cardNumber) {
   let templateCardtitle = cardName.querySelector(`.popup__title`);
+
   templateCardtitle.textContent = window.filter.getFilteredAds()[cardNumber].offer.title;
 };
 
 let setCardAddress = function (cardName, cardNumber) {
   let templateCardAddress = cardName.querySelector(`.popup__text--address`);
+
   templateCardAddress.textContent = window.filter.getFilteredAds()[cardNumber].offer.address;
 };
 
 let setCardPrice = function (cardName, cardNumber) {
   let templateCardPrice = cardName.querySelector(`.popup__text--price`);
+
   templateCardPrice.textContent = []; // обнуляем старые значения
-  templateCardPrice.innerHTML = (`${window.filter.getFilteredAds()[cardNumber].offer.price}₽<span> /ночь</span>`);
+  templateCardPrice.textContent = (`${window.filter.getFilteredAds()[cardNumber].offer.price}₽ /ночь`);
 };
 
 let setCardType = function (cardName, cardNumber) {
   let templateCardType = cardName.querySelector(`.popup__type`);
+
   templateCardType.textContent = window.filter.getFilteredAds()[cardNumber].offer.TYPE;
 };
 
 let setCardCapacity = function (cardName, cardNumber) {
   let templateCardCapacity = cardName.querySelector(`.popup__text--capacity`);
+
   templateCardCapacity.textContent = `${window.filter.getFilteredAds()[cardNumber].offer.rooms} комнаты для ${window.filter.getFilteredAds()[cardNumber].offer.guests} гостей`;
 };
 
@@ -53,6 +57,7 @@ let setCardFeatures = function (cardName, cardNumber) {
 
 let setCardDescription = function (cardName, cardNumber) {
   let templateCardDescription = cardName.querySelector(`.popup__description`);
+
   templateCardDescription.textContent = window.filter.getFilteredAds()[cardNumber].offer.description;
 };
 
@@ -63,6 +68,7 @@ let setCardPhotos = function (cardName, cardNumber) {
 
   for (let j = 0; j < currentPoolPhotos.length; j++) {
     let createElementPhoto = document.createElement(`img`);
+
     createElementPhoto.style.src = currentPoolPhotos[j];
     createElementPhoto.style.width = `45px`;
     createElementPhoto.style.height = `40px`;
@@ -80,6 +86,7 @@ let setCardPhotos = function (cardName, cardNumber) {
 
 let setCardAvatar = function (cardName, cardNumber) {
   let templateCardAvatar = cardName.querySelector(`.popup__avatar`);
+
   templateCardAvatar.src = window.filter.getFilteredAds()[cardNumber].author.avatar;
 };
 
@@ -111,10 +118,12 @@ let renderCard = function (evt) {
 
   map.appendChild(newCard);
 
-  setCardCloseListener();
+  document.addEventListener(`keydown`, window.handlers.renderedCardCloseHandler);
+
+  setCardCloseHandler();
 };
 
-let setCardCloseListener = function () {
+let setCardCloseHandler = function () {
   let popupCloseButton = document.querySelector(`.popup__close`);
   let popupCard = document.querySelector(`.map__card`);
 

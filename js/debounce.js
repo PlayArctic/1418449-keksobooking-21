@@ -3,8 +3,8 @@
 const DEBOUNCE_INTERVAL = 300; // ms
 
 let lastTimeout;
+
 let fixDebounce = function (cb) {
-//  debugger;
   if (lastTimeout) {
     window.clearTimeout(lastTimeout); // пока не выполнено это действия все остальные действия будут откидываться (п2)
   }

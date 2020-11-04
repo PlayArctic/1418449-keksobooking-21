@@ -1,16 +1,16 @@
 // импортируем стандартный модуль node js
-const path = require("path"); // !что за конструкция
+const path = require("path"); // !
 
 module.exports = {
   entry: [
+    "./js/service.js",
+    "./js/request.js",
+    "./js/handlers.js",
     "./js/avatar.js",
     "./js/card.js",
     "./js/filter.js",
-    "./js/loadData.js",
-    "./js/listeners.js",
     "./js/pin.js",
     "./js/pinMove.js",
-    "./js/uploadData.js",
     "./js/validation.js",
     "./js/debounce.js",
   ],

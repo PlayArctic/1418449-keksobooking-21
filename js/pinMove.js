@@ -38,17 +38,11 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
 
         return coord;
       }
-
-      // return coord > max
-      //   ? max
-      //   : coord < min
-      //     ? min
-      //     : coord;
     };
 
     pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`; // тк pin на абсолюте, создаем сдвиг
     pinHandle.style.left = checkerCoords((pinHandle.offsetLeft - shift.x), 0, 1130) + `px`;
-    window.listeners.setCurrentAddress();
+    window.handlers.setCurrentAddress();
   };
 
   let onMouseUp = function (upEvt) {
