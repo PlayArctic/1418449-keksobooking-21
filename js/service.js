@@ -2,7 +2,7 @@
 
 let onSuccessSendCallback = function () {
   let node = document.querySelector(`#success`).content;
-  let newNode = node.cloneNode(true).querySelector(`.success`); // без повторного поиска внутри клонноды .querySelector(`.success`)не добавляется элемент в body
+  let newNode = node.cloneNode(true).querySelector(`.success`);
 
   newNode.classList.add(`overlay`);
 

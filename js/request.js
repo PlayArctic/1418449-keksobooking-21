@@ -39,13 +39,13 @@ let getServerData = function (url, onSuccsessCallback, onErrorCallback) {
 
       return response.json()
         .then(function (forClientData) {
-          data = forClientData.filter((item) => item.offer); // оставляем только те что содержат item.offer
+          data = forClientData.filter((item) => item.offer);
           onSuccsessCallback(data);
         });
     });
 };
 
-let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) { // data это то что передаем на сервер, см. ниже
+let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) {
   let xhr = new XMLHttpRequest();
   xhr.responseType = `json`;
 
@@ -89,7 +89,7 @@ let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) 
   xhr.timeout = 10000;
 
   xhr.open(`POST`, url);
-  xhr.send(clientData); // отправка данных data на сервер
+  xhr.send(clientData);
 };
 
 

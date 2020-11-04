@@ -1,15 +1,15 @@
 'use strict';
 
 const ROOMS_TO_GUESTS_MAP = {
-  '1': [`1`], //  js по умолчанию получает из html string
+  '1': [`1`],
   '2': [`1`, `2`],
   '3': [`1`, `2`, `3`],
-  '100': [`0`] // вынесено за скобки чтобы каждый раз не собирался объект внутри функции
+  '100': [`0`]
 };
 
 let adFormElement = document.querySelector(`#adForm`);
 
-adFormElement.addEventListener(`input`, function (evt) { // общий обработчик на form (делегирование событий)
+adFormElement.addEventListener(`input`, function (evt) {
   let inputId = evt.target.id;
   let inputTarget = evt.target;
 
@@ -50,7 +50,7 @@ let setTitleValidation = function (inputTarget) {
       inputTarget.setCustomValidity(``);
     }
 
-    inputTarget.reportValidity(); // нужен reportValidity тк после setCustomValidity браузер далее валидность не проверяет
+    inputTarget.reportValidity();
   });
 };
 

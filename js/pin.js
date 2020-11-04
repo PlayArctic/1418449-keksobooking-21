@@ -9,14 +9,14 @@ let renderPins = function (data) {
     let newPin = document.querySelector(`#pin`).content.querySelector(`.map__pin`).cloneNode(true);
     let avatarImg = newPin.querySelector(`img`);
 
-    newPin.setAttribute(`data-id`, pinNum); // логический блок
+    newPin.setAttribute(`data-id`, pinNum);
 
-    newPin.style.left = (data[pinNum].location.x - 20) + `px`; // логический блок
+    newPin.style.left = (data[pinNum].location.x - 20) + `px`;
     newPin.style.top = (data[pinNum].location.y - 40) + `px`;
     avatarImg.src = data[pinNum].author.avatar;
     avatarImg.alt = data[pinNum].offer.title;
 
-    avatarImg.setAttribute(`data-id`, pinNum); // логический блок
+    avatarImg.setAttribute(`data-id`, pinNum);
     fragment.appendChild(newPin);
   }
 

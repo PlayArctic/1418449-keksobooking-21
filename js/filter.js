@@ -2,7 +2,7 @@
 
 const DEFAULT_FILTER_VALUE = `any`;
 
-const filters = { // константу внутри менять можно, нельзя записывать туда что-то новое (новую ссылку на другой объект). с примитивами не работает
+const filters = {
   'housing-type': DEFAULT_FILTER_VALUE,
   'housing-price': DEFAULT_FILTER_VALUE,
   'housing-rooms': DEFAULT_FILTER_VALUE,
@@ -28,11 +28,11 @@ let getFilteredAds = function () {
   return filteredAds;
 };
 
-let checkFeature = function (item) { // !логика для несклольких filters.feature сразу
+let checkFeature = function (item) {
   for (let featureKey in filters.features) {
     if (filters.features[featureKey].value
       && !item.offer.features.includes(filters.features[featureKey].key)
-    ) { // если значение true но его нет в features item'a то сразу false
+    ) {
       return false;
     }
   }
@@ -40,7 +40,7 @@ let checkFeature = function (item) { // !логика для несклольк�
   return true;
 };
 
-let filterPrice = function (item) { // !!!
+let filterPrice = function (item) {
   return filters[`housing-price`] === DEFAULT_FILTER_VALUE
     || item.offer.price > priceMap[filters[`housing-price`]].min && item.offer.price < priceMap[filters[`housing-price`]].max;
 };
@@ -58,7 +58,7 @@ let filterGuests = function (item) {
 };
 
 const updateData = function () {
-  filteredAds = window.request.getData().filter(function (item) { // фильтр возвращает новый массив return которых будет true
+  filteredAds = window.request.getData().filter(function (item) {
     return filterPrice(item) && filterType(item) && filterRooms(item) && filterGuests(item) && checkFeature(item);
   });
 
@@ -68,7 +68,7 @@ const updateData = function () {
 
 let setFilterChangeCather = function () {
   document.querySelector(`.map__filters`).addEventListener(`change`, function (evt) {
-    document.querySelectorAll(`button[data-id]`).forEach(function (pin) { // элементы button которые содержат атрибут data-id
+    document.querySelectorAll(`button[data-id]`).forEach(function (pin) {
       pin.remove();
     });
 
@@ -82,7 +82,7 @@ let setFilterChangeCather = function () {
       filters.features[evt.target.id].value = !filters.features[evt.target.id].value;
     }
 
-    window.debounce.fixDebounce(updateData); // передаем невызванную ф-цию updateData а не updateData(). до этого был результат вызова ф-ции в связи с чем вылетала ошибка
+    window.debounce.fixDebounce(updateData);
   });
 };
 

@@ -17,7 +17,7 @@ let setCardAddress = function (cardName, cardNumber) {
 let setCardPrice = function (cardName, cardNumber) {
   let templateCardPrice = cardName.querySelector(`.popup__text--price`);
 
-  templateCardPrice.textContent = []; // обнуляем старые значения
+  templateCardPrice.textContent = [];
   templateCardPrice.textContent = (`${window.filter.getFilteredAds()[cardNumber].offer.price}₽ /ночь`);
 };
 
@@ -50,7 +50,7 @@ let setCardFeatures = function (cardName, cardNumber) {
     fragmentsFeatures.appendChild(createElementFeature);
   }
 
-  templateCardFeatures.textContent = []; // обнуляем старые значения
+  templateCardFeatures.textContent = [];
 
   templateCardFeatures.appendChild(fragmentsFeatures);
 };
@@ -79,7 +79,7 @@ let setCardPhotos = function (cardName, cardNumber) {
     fragmentsPhotos.appendChild(createElementPhoto);
   }
 
-  templateCardPhotos.textContent = []; // обнуляем старые значения
+  templateCardPhotos.textContent = [];
 
   templateCardPhotos.appendChild(fragmentsPhotos);
 };
@@ -93,11 +93,11 @@ let setCardAvatar = function (cardName, cardNumber) {
 let renderCard = function (evt) {
   let mapCard = document.querySelector(`.map__card`);
 
-  if (!evt || !evt.target.dataset.id) { // вся ф-ция заканчивается после return - если не получаем evt или dataset.id (id это начинка dataset)
+  if (!evt || !evt.target.dataset.id) {
     return;
   }
 
-  if (mapCard) { // удаляем предыдущее объявление
+  if (mapCard) {
     mapCard.remove();
   }
 
