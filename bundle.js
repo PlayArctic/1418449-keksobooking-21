@@ -8,9 +8,11 @@
 /*! runtime requirements:  */
 
 
+let nodeSuccess = document.querySelector(`#success`).content;
+let nodeError = document.querySelector(`#error`).content;
+
 let onSuccessSendCallback = function () {
-  let node = document.querySelector(`#success`).content;
-  let newNode = node.cloneNode(true).querySelector(`.success`); // без повторного поиска внутри клонноды .querySelector(`.success`)не добавляется элемент в body
+  let newNode = nodeSuccess.cloneNode(true).querySelector(`.success`); // без повторного поиска внутри клонноды .querySelector(`.success`)не добавляется элемент в body
 
   newNode.classList.add(`overlay`);
 
@@ -24,8 +26,7 @@ let onSuccessSendCallback = function () {
 
 
 let onErrorSendCallback = function (error) {
-  let node = document.querySelector(`#error`).content;
-  let newNode = node.cloneNode(true);
+  let newNode = nodeError.cloneNode(true);
 
   newNode.querySelector(`.error`).classList.add(`overlay`);
   newNode.querySelector(`.error__message`).textContent = error;
@@ -201,6 +202,20 @@ let form = document.querySelector(`#adForm`);
 let submitButton = document.querySelector(`.ad-form__submit`);
 
 
+let typeDependenciesHandler = function (priceInputElement, minPrice) {
+  priceInputElement.setAttribute(`min`, minPrice);
+  priceInputElement.setAttribute(`placeholder`, minPrice);
+};
+
+let setCardCloseHandler = function () {
+  let popupCloseButton = document.querySelector(`.popup__close`);
+  let popupCard = document.querySelector(`.map__card`);
+
+  popupCloseButton.addEventListener(`click`, function () {
+    popupCard.remove();
+  });
+};
+
 /* Вешаем обработчики событий на document. для карточки объявления и overlay */
 
 let mapPinHandler = function (evt) {
@@ -230,9 +245,6 @@ let setRenderedCardHandlers = function () {
   document.querySelector(`.map__pins`).addEventListener(`click`, mapPinHandler); // браузер автоматически передает параметр event, т.к. он там есть. и автоматом когда срабатывает обработчик вызывает ф-цию
   document.querySelector(`.map__pins`).addEventListener(`keydown`, mapPinHandler);
 };
-
-
-// document.addEventListener(`keydown`, overlayCloseHandlerEsc);
 
 
 /* Вешаем обработчики событий на Notice скцию*/
@@ -306,7 +318,6 @@ let mapFadedHandler = function (evt) {
   }
 };
 
-
 form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
 
@@ -328,6 +339,8 @@ setRenderedCardHandlers();
 disableAdform();
 
 window.handlers = {
+  typeDependenciesHandler,
+  setCardCloseHandler,
   setCurrentAddress,
   deactivateAllAdForm,
   setOverlayHandler,
@@ -349,39 +362,59 @@ window.handlers = {
 
 let FILE_TYPES = [`jpg`, `jpeg`, `png`, `gif`];
 
-let setAvatar = function (chooserInput, previewOutput) {
-  chooserInput.addEventListener(`change`, function () {
-    let file = chooserInput.files[0];
-    let fileName = file.name.toLowerCase();
-
-    let matches = FILE_TYPES.some(function (ending) {
-      return fileName.endsWith(ending);
-    });
-
-    if (matches) {
-      let reader = new FileReader();
-
-      reader.readAsDataURL(file);
-
-      reader.addEventListener(`load`, function () {
-        if (previewOutput.tagName.toLowerCase() === `img`) {
-          previewOutput.src = reader.result;
-        } else {
-          let newElement = document.createElement(`img`);
-          newElement.src = reader.result;
-
-          newElement.setAttribute(`style`, `border-radius: 5px; width: 100%; height: 100%;`);
-
-          previewOutput.appendChild(newElement);
-        }
-      });
-    }
-  });
+let AVATAR_TARGETS = {
+  avatar: {
+    input: document.querySelector(`.ad-form-header__input`),
+    output: document.querySelector(`.ad-form-header__preview img`)
+  },
+  photo: {
+    input: document.querySelector(`.ad-form__input`),
+    output: document.querySelector(`.ad-form__photo`)
+  }
 };
 
-setAvatar(document.querySelector(`.ad-form-header__input`), document.querySelector(`.ad-form-header__preview img`));
-setAvatar(document.querySelector(`.ad-form__input`), document.querySelector(`.ad-form__photo`));
 
+// AVATAR_TARGETS.avatar.input.addEventListener(`click`, () => console.log(`Succsess`));
+
+let setAvatar = function (pictureTargets) {
+  console.log(`0`, pictureTargets)
+  for (let elem in pictureTargets) {
+    console.log(`1`, pictureTargets.elem)
+    console.log(`2`, pictureTargets)
+    console.log(`3`, elem)
+    // if (pictureTargets.hasOwnProperty(elem)) {
+    //   (pictureTargets.elem.input).addEventListener(`change`, function () {
+    //     let file = (pictureTargets.elem.input).files[0];
+    //     let fileName = file.name.toLowerCase();
+
+    //     let matches = FILE_TYPES.some(function (ending) {
+    //       return fileName.endsWith(ending);
+    //     });
+
+    //     if (matches) {
+    //       let reader = new FileReader();
+
+    //       reader.readAsDataURL(file);
+
+    //       reader.addEventListener(`load`, function () {
+    //         if ((pictureTargets.elem.output).tagName.toLowerCase() === `img`) {
+    //           elem.output.src = reader.result;
+    //         } else {
+    //           let newElement = document.createElement(`img`);
+    //           newElement.src = reader.result;
+
+    //           newElement.setAttribute(`style`, `border-radius: 5px; width: 100%; height: 100%;`);
+
+    //           (pictureTargets.elem.output).appendChild(newElement);
+    //         }
+    //       });
+    //     }
+    //   });
+    // }
+  }
+};
+
+setAvatar(AVATAR_TARGETS);
 
 })();
 
@@ -394,6 +427,7 @@ setAvatar(document.querySelector(`.ad-form__input`), document.querySelector(`.ad
 
 
 let map = document.querySelector(`.map`);
+let templateCard = document.querySelector(`#card`).content;
 
 let setCardTitle = function (cardName, cardNumber) {
   let templateCardtitle = cardName.querySelector(`.popup__title`);
@@ -494,7 +528,6 @@ let renderCard = function (evt) {
     mapCard.remove();
   }
 
-  let templateCard = document.querySelector(`#card`).content;
   let newCard = templateCard.cloneNode(true);
   let id = evt.target.dataset.id;
 
@@ -513,16 +546,7 @@ let renderCard = function (evt) {
 
   document.addEventListener(`keydown`, window.handlers.renderedCardCloseHandler);
 
-  setCardCloseHandler();
-};
-
-let setCardCloseHandler = function () {
-  let popupCloseButton = document.querySelector(`.popup__close`);
-  let popupCard = document.querySelector(`.map__card`);
-
-  popupCloseButton.addEventListener(`click`, function () {
-    popupCard.remove();
-  });
+  window.handlers.setCardCloseHandler();
 };
 
 window.card = {
@@ -642,7 +666,6 @@ window.filter = {
 /*! runtime requirements:  */
 
 
-
 let renderPins = function (data) {
   let fragment = document.createDocumentFragment();
   let maxAdQuantity = Math.min(data.length, 5);
@@ -651,14 +674,14 @@ let renderPins = function (data) {
     let newPin = document.querySelector(`#pin`).content.querySelector(`.map__pin`).cloneNode(true);
     let avatarImg = newPin.querySelector(`img`);
 
-    newPin.setAttribute(`data-id`, pinNum); // логический блок
-
-    newPin.style.left = (data[pinNum].location.x - 20) + `px`; // логический блок
+    newPin.style.left = (data[pinNum].location.x - 20) + `px`;
     newPin.style.top = (data[pinNum].location.y - 40) + `px`;
+    newPin.dataset.id = pinNum;
+
     avatarImg.src = data[pinNum].author.avatar;
     avatarImg.alt = data[pinNum].offer.title;
+    avatarImg.dataset.id = pinNum;
 
-    avatarImg.setAttribute(`data-id`, pinNum); // логический блок
     fragment.appendChild(newPin);
   }
 
@@ -722,6 +745,7 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
 
     pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`; // тк pin на абсолюте, создаем сдвиг
     pinHandle.style.left = checkerCoords((pinHandle.offsetLeft - shift.x), 0, 1130) + `px`;
+
     window.handlers.setCurrentAddress();
   };
 
@@ -762,6 +786,13 @@ const ROOMS_TO_GUESTS_MAP = {
   '3': [`1`, `2`, `3`],
   '100': [`0`] // вынесено за скобки чтобы каждый раз не собирался объект внутри функции
 };
+const EARLY_CHECKTIME = `12:00`;
+const MIDDLE_CHECKTIME = `13:00`;
+const LATE_CHECKTIME = `14:00`;
+const MIN_PRICE_BUNGALOW = 0;
+const MIN_PRICE_FLAT = 1000;
+const MIN_PRICE_HOUSE = 5000;
+const MIN_PRICE_PALACE = 10000;
 
 let adFormElement = document.querySelector(`#adForm`);
 
@@ -780,10 +811,10 @@ adFormElement.addEventListener(`input`, function (evt) { // общий обра�
       setTypeDependencies();
       break;
     case `timein`:
-      setTimeInDependencies(inputTarget);
+      setCheckInDependencies(inputTarget);
       break;
     case `timeout`:
-      setTimeOutDependencies(inputTarget);
+      setCheckOutDependencies(inputTarget);
       break;
     case `room_number`:
       setGuestDependencies();
@@ -824,58 +855,55 @@ let setPriceValidation = function (inputTarget) {
   inputTarget.reportValidity();
 };
 
+
 let setTypeDependencies = function () {
   let priceElement = document.querySelector(`#price`);
   let typeElement = document.querySelector(`#type`);
 
   switch (typeElement.value) {
     case `bungalow`:
-      priceElement.setAttribute(`min`, `0`);
-      priceElement.setAttribute(`placeholder`, `0`);
+      window.handlers.typeDependenciesHandler(priceElement, MIN_PRICE_BUNGALOW);
       break;
     case `flat`:
-      priceElement.setAttribute(`min`, `1000`);
-      priceElement.setAttribute(`placeholder`, `1000`);
+      window.handlers.typeDependenciesHandler(priceElement, MIN_PRICE_FLAT);
       break;
     case `house`:
-      priceElement.setAttribute(`min`, `5000`);
-      priceElement.setAttribute(`placeholder`, `5000`);
+      window.handlers.typeDependenciesHandler(priceElement, MIN_PRICE_HOUSE);
       break;
     case `palace`:
-      priceElement.setAttribute(`min`, `10000`);
-      priceElement.setAttribute(`placeholder`, `10000`);
+      window.handlers.typeDependenciesHandler(priceElement, MIN_PRICE_PALACE);
       break;
   }
 };
 
-let setTimeInDependencies = function (inputTarget) {
-  let timeOut = document.querySelector(`#timeout`);
+let setCheckInDependencies = function (inputTarget) {
+  let checkOut = document.querySelector(`#timeout`);
 
   switch (inputTarget.value) {
-    case `12:00`:
-      timeOut.value = `12:00`;
+    case EARLY_CHECKTIME:
+      checkOut.value = EARLY_CHECKTIME;
       break;
-    case `13:00`:
-      timeOut.value = `13:00`;
+    case MIDDLE_CHECKTIME:
+      checkOut.value = MIDDLE_CHECKTIME;
       break;
-    case `14:00`:
-      timeOut.value = `14:00`;
+    case LATE_CHECKTIME:
+      checkOut.value = LATE_CHECKTIME;
       break;
   }
 };
 
-let setTimeOutDependencies = function (inputTarget) {
-  let timeIn = document.querySelector(`#timein`);
+let setCheckOutDependencies = function (inputTarget) {
+  let checkIn = document.querySelector(`#timein`);
 
   switch (inputTarget.value) {
-    case `12:00`:
-      timeIn.value = `12:00`;
+    case EARLY_CHECKTIME:
+      checkIn.value = EARLY_CHECKTIME;
       break;
-    case `13:00`:
-      timeIn.value = `13:00`;
+    case MIDDLE_CHECKTIME:
+      checkIn.value = MIDDLE_CHECKTIME;
       break;
-    case `14:00`:
-      timeIn.value = `14:00`;
+    case LATE_CHECKTIME:
+      checkIn.value = LATE_CHECKTIME;
       break;
   }
 };

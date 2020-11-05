@@ -1,8 +1,10 @@
 'use strict';
 
+let nodeSuccess = document.querySelector(`#success`).content;
+let nodeError = document.querySelector(`#error`).content;
+
 let onSuccessSendCallback = function () {
-  let node = document.querySelector(`#success`).content;
-  let newNode = node.cloneNode(true).querySelector(`.success`); // без повторного поиска внутри клонноды .querySelector(`.success`)не добавляется элемент в body
+  let newNode = nodeSuccess.cloneNode(true).querySelector(`.success`); // без повторного поиска внутри клонноды .querySelector(`.success`)не добавляется элемент в body
 
   newNode.classList.add(`overlay`);
 
@@ -16,8 +18,7 @@ let onSuccessSendCallback = function () {
 
 
 let onErrorSendCallback = function (error) {
-  let node = document.querySelector(`#error`).content;
-  let newNode = node.cloneNode(true);
+  let newNode = nodeError.cloneNode(true);
 
   newNode.querySelector(`.error`).classList.add(`overlay`);
   newNode.querySelector(`.error__message`).textContent = error;

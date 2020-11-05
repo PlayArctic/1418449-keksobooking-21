@@ -6,6 +6,13 @@ const ROOMS_TO_GUESTS_MAP = {
   '3': [`1`, `2`, `3`],
   '100': [`0`] // вынесено за скобки чтобы каждый раз не собирался объект внутри функции
 };
+const EARLY_CHECKTIME = `12:00`;
+const MIDDLE_CHECKTIME = `13:00`;
+const LATE_CHECKTIME = `14:00`;
+const MIN_PRICE_BUNGALOW = 0;
+const MIN_PRICE_FLAT = 1000;
+const MIN_PRICE_HOUSE = 5000;
+const MIN_PRICE_PALACE = 10000;
 
 let adFormElement = document.querySelector(`#adForm`);
 
@@ -24,10 +31,10 @@ adFormElement.addEventListener(`input`, function (evt) { // общий обра�
       setTypeDependencies();
       break;
     case `timein`:
-      setTimeInDependencies(inputTarget);
+      setCheckInDependencies(inputTarget);
       break;
     case `timeout`:
-      setTimeOutDependencies(inputTarget);
+      setCheckOutDependencies(inputTarget);
       break;
     case `room_number`:
       setGuestDependencies();
@@ -68,58 +75,55 @@ let setPriceValidation = function (inputTarget) {
   inputTarget.reportValidity();
 };
 
+
 let setTypeDependencies = function () {
   let priceElement = document.querySelector(`#price`);
   let typeElement = document.querySelector(`#type`);
 
   switch (typeElement.value) {
     case `bungalow`:
-      priceElement.setAttribute(`min`, `0`);
-      priceElement.setAttribute(`placeholder`, `0`);
+      window.handlers.typeDependenciesHandler(priceElement, MIN_PRICE_BUNGALOW);
       break;
     case `flat`:
-      priceElement.setAttribute(`min`, `1000`);
-      priceElement.setAttribute(`placeholder`, `1000`);
+      window.handlers.typeDependenciesHandler(priceElement, MIN_PRICE_FLAT);
       break;
     case `house`:
-      priceElement.setAttribute(`min`, `5000`);
-      priceElement.setAttribute(`placeholder`, `5000`);
+      window.handlers.typeDependenciesHandler(priceElement, MIN_PRICE_HOUSE);
       break;
     case `palace`:
-      priceElement.setAttribute(`min`, `10000`);
-      priceElement.setAttribute(`placeholder`, `10000`);
+      window.handlers.typeDependenciesHandler(priceElement, MIN_PRICE_PALACE);
       break;
   }
 };
 
-let setTimeInDependencies = function (inputTarget) {
-  let timeOut = document.querySelector(`#timeout`);
+let setCheckInDependencies = function (inputTarget) {
+  let checkOut = document.querySelector(`#timeout`);
 
   switch (inputTarget.value) {
-    case `12:00`:
-      timeOut.value = `12:00`;
+    case EARLY_CHECKTIME:
+      checkOut.value = EARLY_CHECKTIME;
       break;
-    case `13:00`:
-      timeOut.value = `13:00`;
+    case MIDDLE_CHECKTIME:
+      checkOut.value = MIDDLE_CHECKTIME;
       break;
-    case `14:00`:
-      timeOut.value = `14:00`;
+    case LATE_CHECKTIME:
+      checkOut.value = LATE_CHECKTIME;
       break;
   }
 };
 
-let setTimeOutDependencies = function (inputTarget) {
-  let timeIn = document.querySelector(`#timein`);
+let setCheckOutDependencies = function (inputTarget) {
+  let checkIn = document.querySelector(`#timein`);
 
   switch (inputTarget.value) {
-    case `12:00`:
-      timeIn.value = `12:00`;
+    case EARLY_CHECKTIME:
+      checkIn.value = EARLY_CHECKTIME;
       break;
-    case `13:00`:
-      timeIn.value = `13:00`;
+    case MIDDLE_CHECKTIME:
+      checkIn.value = MIDDLE_CHECKTIME;
       break;
-    case `14:00`:
-      timeIn.value = `14:00`;
+    case LATE_CHECKTIME:
+      checkIn.value = LATE_CHECKTIME;
       break;
   }
 };

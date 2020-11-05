@@ -14,6 +14,20 @@ let form = document.querySelector(`#adForm`);
 let submitButton = document.querySelector(`.ad-form__submit`);
 
 
+let typeDependenciesHandler = function (priceInputElement, minPrice) {
+  priceInputElement.setAttribute(`min`, minPrice);
+  priceInputElement.setAttribute(`placeholder`, minPrice);
+};
+
+let setCardCloseHandler = function () {
+  let popupCloseButton = document.querySelector(`.popup__close`);
+  let popupCard = document.querySelector(`.map__card`);
+
+  popupCloseButton.addEventListener(`click`, function () {
+    popupCard.remove();
+  });
+};
+
 /* Вешаем обработчики событий на document. для карточки объявления и overlay */
 
 let mapPinHandler = function (evt) {
@@ -116,7 +130,6 @@ let mapFadedHandler = function (evt) {
   }
 };
 
-
 form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
 
@@ -138,6 +151,8 @@ setRenderedCardHandlers();
 disableAdform();
 
 window.handlers = {
+  typeDependenciesHandler,
+  setCardCloseHandler,
   setCurrentAddress,
   deactivateAllAdForm,
   setOverlayHandler,

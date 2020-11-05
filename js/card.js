@@ -1,6 +1,7 @@
 'use strict';
 
 let map = document.querySelector(`.map`);
+let templateCard = document.querySelector(`#card`).content;
 
 let setCardTitle = function (cardName, cardNumber) {
   let templateCardtitle = cardName.querySelector(`.popup__title`);
@@ -101,7 +102,6 @@ let renderCard = function (evt) {
     mapCard.remove();
   }
 
-  let templateCard = document.querySelector(`#card`).content;
   let newCard = templateCard.cloneNode(true);
   let id = evt.target.dataset.id;
 
@@ -120,16 +120,7 @@ let renderCard = function (evt) {
 
   document.addEventListener(`keydown`, window.handlers.renderedCardCloseHandler);
 
-  setCardCloseHandler();
-};
-
-let setCardCloseHandler = function () {
-  let popupCloseButton = document.querySelector(`.popup__close`);
-  let popupCard = document.querySelector(`.map__card`);
-
-  popupCloseButton.addEventListener(`click`, function () {
-    popupCard.remove();
-  });
+  window.handlers.setCardCloseHandler();
 };
 
 window.card = {
