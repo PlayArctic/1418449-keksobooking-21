@@ -5,11 +5,11 @@ let pinHandle = document.querySelector(`.map__pin--main`);
 pinHandle.addEventListener(`mousedown`, function (evt) {
 
   let startCoords = {
-    x: evt.clientX, // положение мыши на экране
+    x: evt.clientX,
     y: evt.clientY
   };
 
-  let dragged = false; // флаг для отлова движения
+  let dragged = false;
 
   let onMouseMove = function (moveEvt) {
     moveEvt.preventDefault();
@@ -21,7 +21,7 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
       y: startCoords.y - moveEvt.clientY
     };
 
-    startCoords = { // цепочка обсластей видимости. записываем в родительский startCoords
+    startCoords = {
       x: moveEvt.clientX,
       y: moveEvt.clientY
     };
@@ -40,7 +40,7 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
       }
     };
 
-    pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`; // тк pin на абсолюте, создаем сдвиг
+    pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`;
     pinHandle.style.left = checkerCoords((pinHandle.offsetLeft - shift.x), 0, 1130) + `px`;
 
     window.handlers.setCurrentAddress();
@@ -62,7 +62,7 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
   };
 
 
-  document.addEventListener(`mousemove`, onMouseMove); // именно на document. так как движение и отжатие отслеживаем на всей странице
+  document.addEventListener(`mousemove`, onMouseMove);
   document.addEventListener(`mouseup`, onMouseUp);
 });
 

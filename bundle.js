@@ -373,9 +373,6 @@ let AVATAR_TARGETS = [
   }
 ];
 
-
-// AVATAR_TARGETS.avatar.input.addEventListener(`click`, () => console.log(`Succsess`)); // !работает
-
 let setAvatar = function (pictureTargets) {
   for (let elem of pictureTargets) {
     elem.input.addEventListener(`change`, function () {

@@ -54,7 +54,7 @@ let overlayCloseHandlerEsc = function (evt) {
 
 
 let setRenderedCardHandlers = function () {
-  document.querySelector(`.map__pins`).addEventListener(`click`, mapPinHandler); // браузер автоматически передает параметр event, т.к. он там есть. и автоматом когда срабатывает обработчик вызывает ф-цию
+  document.querySelector(`.map__pins`).addEventListener(`click`, mapPinHandler);
   document.querySelector(`.map__pins`).addEventListener(`keydown`, mapPinHandler);
 };
 
@@ -134,7 +134,7 @@ form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
 
   window.request.uploadData(window.request.URL_UPLOAD_ADDRESS, window.service.onSuccessSendCallback,
-      window.service.onErrorSendCallback, (new FormData(form))); // FormData автоматически считывает поля из form
+      window.service.onErrorSendCallback, (new FormData(form)));
 
   window.handlers.deactivateAllAdForm();
 });
