@@ -18,7 +18,7 @@ let setCardAddress = function (cardName, cardNumber) {
 let setCardPrice = function (cardName, cardNumber) {
   let templateCardPrice = cardName.querySelector(`.popup__text--price`);
 
-  templateCardPrice.textContent = []; // обнуляем старые значения
+  templateCardPrice.textContent = ``; // обнуляем старые значения
   templateCardPrice.textContent = (`${window.filter.getFilteredAds()[cardNumber].offer.price}₽ /ночь`);
 };
 
@@ -51,7 +51,7 @@ let setCardFeatures = function (cardName, cardNumber) {
     fragmentsFeatures.appendChild(createElementFeature);
   }
 
-  templateCardFeatures.textContent = []; // обнуляем старые значения
+  templateCardFeatures.textContent = ``; // обнуляем старые значения
 
   templateCardFeatures.appendChild(fragmentsFeatures);
 };
@@ -80,7 +80,7 @@ let setCardPhotos = function (cardName, cardNumber) {
     fragmentsPhotos.appendChild(createElementPhoto);
   }
 
-  templateCardPhotos.textContent = []; // обнуляем старые значения
+  templateCardPhotos.textContent = ``; // обнуляем старые значения
 
   templateCardPhotos.appendChild(fragmentsPhotos);
 };

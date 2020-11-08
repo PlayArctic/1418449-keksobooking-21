@@ -1,8 +1,10 @@
 'use strict';
 
+const MAX_AD_QTY = 5;
+
 let renderPins = function (data) {
   let fragment = document.createDocumentFragment();
-  let maxAdQuantity = Math.min(data.length, 5);
+  let maxAdQuantity = Math.min(data.length, MAX_AD_QTY);
 
   for (let pinNum = 0; pinNum < maxAdQuantity; pinNum++) {
     let newPin = document.querySelector(`#pin`).content.querySelector(`.map__pin`).cloneNode(true);

@@ -4,7 +4,7 @@ let mapPin = document.querySelector(`.map__pin--main`);
 let mapFaded = document.querySelector(`.map--faded`);
 let map = document.querySelector(`.map`);
 let mapFilters = document.querySelectorAll(`.map__filter`);
-let mapFeaures = document.querySelector(`.map__features`);
+let mapFeatures = document.querySelector(`.map__features`);
 let adForm = document.querySelector(`.ad-form`);
 let mapAdFormDisabled = document.querySelector(`.ad-form--disabled`);
 let adFormAll = document.querySelectorAll(`.ad-form__element`);
@@ -69,7 +69,7 @@ let disableAdform = function () {
     feature.setAttribute(`disabled`, `disabled`);
   }
 
-  mapFeaures.setAttribute(`disabled`, `disabled`);
+  mapFeatures .setAttribute(`disabled`, `disabled`);
 };
 
 let enableAdForm = function () {
@@ -80,7 +80,7 @@ let enableAdForm = function () {
     feature.removeAttribute(`disabled`);
   }
 
-  mapFeaures.removeAttribute(`disabled`);
+  mapFeatures .removeAttribute(`disabled`);
 };
 
 let setCurrentAddress = function () {
@@ -97,7 +97,7 @@ let activateAllAdForm = function () {
 
   document.querySelector(`#title`).setAttribute(`required`, `required`);
 
-  window.request.getServerData(window.request.URL_LOAD_ADDRESS, window.filter.updateData, window.service.onErrorReceiveCallback);
+  window.request.sendRequest(window.request.URL_LOAD_ADDRESS, window.filter.updateData, window.service.onErrorReceiveCallback);
   enableAdForm();
 };
 
@@ -133,8 +133,8 @@ let mapFadedHandler = function (evt) {
 form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
 
-  window.request.uploadData(window.request.URL_UPLOAD_ADDRESS, window.service.onSuccessSendCallback,
-      window.service.onErrorSendCallback, (new FormData(form))); // FormData автоматически считывает поля из form
+  window.request.sendRequest(window.request.URL_UPLOAD_ADDRESS, window.service.onSuccessSendCallback,
+      window.service.onErrorSendCallback, `POST`, (new FormData(form))); // FormData автоматически считывает поля из form
 
   window.handlers.deactivateAllAdForm();
 });
@@ -147,6 +147,7 @@ mapPin.addEventListener(`keydown`, mapFadedHandler);
 
 resetButton.addEventListener(`click`, deactivateAllAdForm);
 
+setCurrentAddress();
 setRenderedCardHandlers();
 disableAdform();
 

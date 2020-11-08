@@ -75,108 +75,167 @@ window.service = {
   \***********************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements:  */
+/* eslint-disable object-shorthand */
 
 
 let URL_LOAD_ADDRESS = `https://21.javascript.pages.academy/keksobooking/data`;
 let URL_UPLOAD_ADDRESS = `https://21.javascript.pages.academy/keksobooking`;
 
 let data = [];
+let error;
 
 let getData = function () {
   return data;
 };
 
-let getServerData = function (url, onSuccsessCallback, onErrorCallback) {
-
+let getErrorStatus = function (errorResponse) {
   const WRONG_REQUEST_CODE = 400;
   const NOT_AUTHORIZED_CODE = 401;
   const NOT_FOUND_CODE = 404;
-  let error;
 
-  return fetch(url)
-    .then(function (response) {
-      if (response.status >= 400) {
-        switch (response.status) {
-          case WRONG_REQUEST_CODE:
-            error = `Неверный запрос`;
-            break;
-          case NOT_AUTHORIZED_CODE:
-            error = `Пользователь не авторизован`;
-            break;
-          case NOT_FOUND_CODE:
-            error = `Ничего не найдено`;
-            break;
+  switch (errorResponse.status) {
+    case WRONG_REQUEST_CODE:
+      error = `Неверный запрос`;
+      break;
+    case NOT_AUTHORIZED_CODE:
+      error = `Пользователь не авторизован`;
+      break;
+    case NOT_FOUND_CODE:
+      error = `Ничего не найдено`;
+      break;
+    default:
+      error = `Cтатус ответа: : ` + errorResponse.status + ` ` + errorResponse.statusText;
+  }
+};
 
-          default:
-            error = `Cтатус ответа: : ` + response.status + ` ` + response.statusText;
-        }
+let sendRequest = function (url, onSuccessCallback, onErrorCallback, method, body) { // body = null
+  const headers = {
+    'content-type': `application/json`
+  };
 
-        return onErrorCallback(error);
+  if (body === undefined) {
+    fetch(url).then((response) => { // !!
+      if (response.ok) {
+        response.json()
+          .then(function (forClientData) {
+            data = forClientData.filter((item) => item.offer); // оставляем только те что содержат item.offer
+            onSuccessCallback(data);
+          });
+      } else {
+        getErrorStatus(response);
+        onErrorCallback(error);
       }
-
-      return response.json()
-        .then(function (forClientData) {
-          data = forClientData.filter((item) => item.offer); // оставляем только те что содержат item.offer
-          onSuccsessCallback(data);
-        });
     });
+  } else {
+    fetch(url, {
+      method: method,
+      body: JSON.stringify(body),
+      headers: headers,
+    }).then((response) => { // !!
+      if (response.ok) {
+        data = response.json();
+        onSuccessCallback(data);
+      } else {
+        getErrorStatus(response);
+        onErrorCallback(error);
+      }
+    });
+  }
 };
-
-let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) { // data это то что передаем на сервер, см. ниже
-  let xhr = new XMLHttpRequest();
-  xhr.responseType = `json`;
-
-  xhr.addEventListener(`load`, function () {
-    const SUCCESS_CODE = 200;
-    const WRONG_REQUEST_CODE = 400;
-    const NOT_AUTHORIZED_CODE = 401;
-    const NOT_FOUND_CODE = 404;
-    let error;
-
-    switch (xhr.status) {
-      case SUCCESS_CODE:
-        onSuccessCallback();
-        break;
-      case WRONG_REQUEST_CODE:
-        error = `Неверный запрос`;
-        break;
-      case NOT_AUTHORIZED_CODE:
-        error = `Пользователь не авторизован`;
-        break;
-      case NOT_FOUND_CODE:
-        error = `Ничего не найдено`;
-        break;
-      default:
-        error = `Cтатус ответа: : ` + xhr.status + ` ` + xhr.statusText;
-    }
-
-    if (error) {
-      onErrorCallback(error);
-    }
-  });
-
-  xhr.addEventListener(`error`, function () {
-    onErrorCallback(`Произошла ошибка соединения`);
-  });
-
-  xhr.addEventListener(`timeout`, function () {
-    onErrorCallback(`Запрос не успел выполниться за ` + xhr.timeout + `мс`);
-  });
-
-  xhr.timeout = 10000;
-
-  xhr.open(`POST`, url);
-  xhr.send(clientData); // отправка данных data на сервер
-};
-
 
 window.request = {
   URL_LOAD_ADDRESS,
   URL_UPLOAD_ADDRESS,
-  getServerData,
   getData,
-  uploadData,
+  sendRequest,
+  // getRequest,
+  // getServerData,
+  // uploadData,
 };
+
+
+// let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) { // data это то что передаем на сервер, см. ниже
+//   let xhr = new XMLHttpRequest();
+//   xhr.responseType = `json`;
+
+//   xhr.addEventListener(`load`, function () {
+//     const SUCCESS_CODE = 200;
+//     const WRONG_REQUEST_CODE = 400;
+//     const NOT_AUTHORIZED_CODE = 401;
+//     const NOT_FOUND_CODE = 404;
+//     let error;
+
+//     switch (xhr.status) {
+//       case SUCCESS_CODE:
+//         onSuccessCallback();
+//         break;
+//       case WRONG_REQUEST_CODE:
+//         error = `Неверный запрос`;
+//         break;
+//       case NOT_AUTHORIZED_CODE:
+//         error = `Пользователь не авторизован`;
+//         break;
+//       case NOT_FOUND_CODE:
+//         error = `Ничего не найдено`;
+//         break;
+//       default:
+//         error = `Cтатус ответа: : ` + xhr.status + ` ` + xhr.statusText;
+//     }
+
+//     if (error) {
+//       onErrorCallback(error);
+//     }
+//   });
+
+//   xhr.addEventListener(`error`, function () {
+//     onErrorCallback(`Произошла ошибка соединения`);
+//   });
+
+//   xhr.addEventListener(`timeout`, function () {
+//     onErrorCallback(`Запрос не успел выполниться за ` + xhr.timeout + `мс`);
+//   });
+
+//   xhr.timeout = 10000;
+
+//   xhr.open(`POST`, url);
+//   xhr.send(clientData); // отправка данных data на сервер
+// };
+
+// let getRequest = function (url, onSuccessCallback, onErrorCallback) {
+
+//   const WRONG_REQUEST_CODE = 400;
+//   const NOT_AUTHORIZED_CODE = 401;
+//   const NOT_FOUND_CODE = 404;
+//   let error;
+
+//   return fetch(url)
+//     .then(function (response) {
+//       if (response.status >= 400) {
+//         switch (response.status) {
+//           case WRONG_REQUEST_CODE:
+//             error = `Неверный запрос`;
+//             break;
+//           case NOT_AUTHORIZED_CODE:
+//             error = `Пользователь не авторизован`;
+//             break;
+//           case NOT_FOUND_CODE:
+//             error = `Ничего не найдено`;
+//             break;
+
+//           default:
+//             error = `Cтатус ответа: : ` + response.status + ` ` + response.statusText;
+//         }
+
+//         return onErrorCallback(error);
+//       }
+
+//       return response.json()
+//         .then(function (forClientData) {
+//           data = forClientData.filter((item) => item.offer); // оставляем только те что содержат item.offer
+//           onSuccessCallback(data);
+//         });
+//     });
+// };
 
 })();
 
@@ -192,7 +251,7 @@ let mapPin = document.querySelector(`.map__pin--main`);
 let mapFaded = document.querySelector(`.map--faded`);
 let map = document.querySelector(`.map`);
 let mapFilters = document.querySelectorAll(`.map__filter`);
-let mapFeaures = document.querySelector(`.map__features`);
+let mapFeatures = document.querySelector(`.map__features`);
 let adForm = document.querySelector(`.ad-form`);
 let mapAdFormDisabled = document.querySelector(`.ad-form--disabled`);
 let adFormAll = document.querySelectorAll(`.ad-form__element`);
@@ -257,7 +316,7 @@ let disableAdform = function () {
     feature.setAttribute(`disabled`, `disabled`);
   }
 
-  mapFeaures.setAttribute(`disabled`, `disabled`);
+  mapFeatures .setAttribute(`disabled`, `disabled`);
 };
 
 let enableAdForm = function () {
@@ -268,7 +327,7 @@ let enableAdForm = function () {
     feature.removeAttribute(`disabled`);
   }
 
-  mapFeaures.removeAttribute(`disabled`);
+  mapFeatures .removeAttribute(`disabled`);
 };
 
 let setCurrentAddress = function () {
@@ -285,7 +344,7 @@ let activateAllAdForm = function () {
 
   document.querySelector(`#title`).setAttribute(`required`, `required`);
 
-  window.request.getServerData(window.request.URL_LOAD_ADDRESS, window.filter.updateData, window.service.onErrorReceiveCallback);
+  window.request.sendRequest(window.request.URL_LOAD_ADDRESS, window.filter.updateData, window.service.onErrorReceiveCallback);
   enableAdForm();
 };
 
@@ -321,8 +380,8 @@ let mapFadedHandler = function (evt) {
 form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
 
-  window.request.uploadData(window.request.URL_UPLOAD_ADDRESS, window.service.onSuccessSendCallback,
-      window.service.onErrorSendCallback, (new FormData(form))); // FormData автоматически считывает поля из form
+  window.request.sendRequest(window.request.URL_UPLOAD_ADDRESS, window.service.onSuccessSendCallback,
+      window.service.onErrorSendCallback, `POST`, (new FormData(form))); // FormData автоматически считывает поля из form
 
   window.handlers.deactivateAllAdForm();
 });
@@ -335,6 +394,7 @@ mapPin.addEventListener(`keydown`, mapFadedHandler);
 
 resetButton.addEventListener(`click`, deactivateAllAdForm);
 
+setCurrentAddress();
 setRenderedCardHandlers();
 disableAdform();
 
@@ -372,9 +432,6 @@ let AVATAR_TARGETS = [
     output: document.querySelector(`.ad-form__photo`)
   }
 ];
-
-
-// AVATAR_TARGETS.avatar.input.addEventListener(`click`, () => console.log(`Succsess`)); // !работает
 
 let setAvatar = function (pictureTargets) {
   for (let elem of pictureTargets) {
@@ -438,7 +495,7 @@ let setCardAddress = function (cardName, cardNumber) {
 let setCardPrice = function (cardName, cardNumber) {
   let templateCardPrice = cardName.querySelector(`.popup__text--price`);
 
-  templateCardPrice.textContent = []; // обнуляем старые значения
+  templateCardPrice.textContent = ``; // обнуляем старые значения
   templateCardPrice.textContent = (`${window.filter.getFilteredAds()[cardNumber].offer.price}₽ /ночь`);
 };
 
@@ -471,7 +528,7 @@ let setCardFeatures = function (cardName, cardNumber) {
     fragmentsFeatures.appendChild(createElementFeature);
   }
 
-  templateCardFeatures.textContent = []; // обнуляем старые значения
+  templateCardFeatures.textContent = ``; // обнуляем старые значения
 
   templateCardFeatures.appendChild(fragmentsFeatures);
 };
@@ -500,7 +557,7 @@ let setCardPhotos = function (cardName, cardNumber) {
     fragmentsPhotos.appendChild(createElementPhoto);
   }
 
-  templateCardPhotos.textContent = []; // обнуляем старые значения
+  templateCardPhotos.textContent = ``; // обнуляем старые значения
 
   templateCardPhotos.appendChild(fragmentsPhotos);
 };
@@ -660,9 +717,11 @@ window.filter = {
 /*! runtime requirements:  */
 
 
+const MAX_AD_QTY = 5;
+
 let renderPins = function (data) {
   let fragment = document.createDocumentFragment();
-  let maxAdQuantity = Math.min(data.length, 5);
+  let maxAdQuantity = Math.min(data.length, MAX_AD_QTY);
 
   for (let pinNum = 0; pinNum < maxAdQuantity; pinNum++) {
     let newPin = document.querySelector(`#pin`).content.querySelector(`.map__pin`).cloneNode(true);
@@ -737,7 +796,7 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
       }
     };
 
-    pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`; // тк pin на абсолюте, создаем сдвиг
+    pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 192, 692) + `px`; // тк pin на абсолюте, создаем сдвиг
     pinHandle.style.left = checkerCoords((pinHandle.offsetLeft - shift.x), 0, 1130) + `px`;
 
     window.handlers.setCurrentAddress();
@@ -939,7 +998,7 @@ window.validation.setAllowedFiles();
 /*! runtime requirements:  */
 
 
-const DEBOUNCE_INTERVAL = 300; // ms
+const DEBOUNCE_INTERVAL = 500; // ms
 
 let lastTimeout;
 
