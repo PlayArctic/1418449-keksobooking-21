@@ -97,7 +97,7 @@ let activateAllAdForm = function () {
 
   document.querySelector(`#title`).setAttribute(`required`, `required`);
 
-  window.request.sendRequest(window.request.URL_LOAD_ADDRESS, window.filter.updateData, window.service.onErrorReceiveCallback);
+  window.request.sendRequest(window.request.URL_LOAD_ADDRESS, null, window.filter.updateData, window.service.onErrorReceiveCallback);
   enableAdForm();
 };
 
@@ -133,8 +133,12 @@ let mapFadedHandler = function (evt) {
 form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
 
-  window.request.sendRequest(window.request.URL_UPLOAD_ADDRESS, window.service.onSuccessSendCallback,
-      window.service.onErrorSendCallback, `POST`, (new FormData(form))); // FormData автоматически считывает поля из form
+  window.request.sendRequest(
+    window.request.URL_UPLOAD_ADDRESS,
+    new FormData(form),
+    window.service.onSuccessSendCallback,
+    window.service.onErrorSendCallback
+  );
 
   window.handlers.deactivateAllAdForm();
 });
