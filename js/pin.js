@@ -1,8 +1,8 @@
 'use strict';
 
 const MAX_AD_QTY = 5;
-const PIN_SHIWT_WIDTH = 20;
-const PIN_SHIWT_HEIGHT = 40;
+const PIN_SHIFT_WIDTH = 20;
+const PIN_SHIFT_HEIGHT = 40;
 
 let renderPins = function (data) {
   let fragment = document.createDocumentFragment();
@@ -12,8 +12,8 @@ let renderPins = function (data) {
     let newPin = document.querySelector(`#pin`).content.querySelector(`.map__pin`).cloneNode(true);
     let avatarImg = newPin.querySelector(`img`);
 
-    newPin.style.left = (data[pinNum].location.x - PIN_SHIWT_WIDTH) + `px`;
-    newPin.style.top = (data[pinNum].location.y - PIN_SHIWT_HEIGHT) + `px`;
+    newPin.style.left = (data[pinNum].location.x - PIN_SHIFT_WIDTH) + `px`;
+    newPin.style.top = (data[pinNum].location.y - PIN_SHIFT_HEIGHT) + `px`;
     newPin.dataset.id = pinNum;
 
     avatarImg.src = data[pinNum].author.avatar;
