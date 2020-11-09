@@ -10,23 +10,6 @@ let getData = function () {
   return data;
 };
 
-let getErrorMessage = function (errorResponse) {
-  const WRONG_REQUEST_CODE = 400;
-  const NOT_AUTHORIZED_CODE = 401;
-  const NOT_FOUND_CODE = 404;
-
-  switch (errorResponse.status) {
-    case WRONG_REQUEST_CODE:
-      return `Неверный запрос`;
-    case NOT_AUTHORIZED_CODE:
-      return `Пользователь не авторизован`;
-    case NOT_FOUND_CODE:
-      return `Ничего не найдено`;
-    default:
-      return `Cтатус ответа: ` + errorResponse.status + ` ` + errorResponse.statusText;
-  }
-};
-
 let sendRequest = function (url, body, onSuccessCallback, onErrorCallback ) { // data это то что передаем на сервер, см. ниже
   let xhr = new XMLHttpRequest();
   xhr.responseType = `json`;
@@ -76,25 +59,43 @@ let sendRequest = function (url, body, onSuccessCallback, onErrorCallback ) { //
 
   xhr.timeout = 10000;
 
-  xhr.open(body ? 'POST' : 'GET', url);
+  xhr.open(body ? `POST` : `GET`, url);
   xhr.send(body);
 };
 
-let sendRequestFetch = function (url, body, onSuccessCallback, onErrorCallback,) {
+
+let getErrorMessage = function (errorResponse) {
+  const WRONG_REQUEST_CODE = 400;
+  const NOT_AUTHORIZED_CODE = 401;
+  const NOT_FOUND_CODE = 404;
+
+  switch (errorResponse.status) {
+    case WRONG_REQUEST_CODE:
+      return `Неверный запрос`;
+    case NOT_AUTHORIZED_CODE:
+      return `Пользователь не авторизован`;
+    case NOT_FOUND_CODE:
+      return `Ничего не найдено`;
+    default:
+      return `Cтатус ответа: ` + errorResponse.status + ` ` + errorResponse.statusText;
+  }
+};
+
+let sendRequestFetch = function (url, body, onSuccessCallback, onErrorCallback) {
   const params = {
-    method: body ? 'POST' : 'GET',
+    method: body ? `POST` : `GET`,
     headers: {
-      'Content-Type': 'multipart/form-data'
+      'Content-Type': `multipart/form-data`
     },
   };
 
-  if(body) {
+  if (body) {
     params.body = body;
   }
 
   fetch(url, params)
     .then((response) => {
-      if(response.ok) {
+      if (response.ok) {
         return response.json();
       } else {
         return new Promise((resolve, reject) => {
