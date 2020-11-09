@@ -87,24 +87,7 @@ let getData = function () {
   return data;
 };
 
-let getErrorMessage = function (errorResponse) {
-  const WRONG_REQUEST_CODE = 400;
-  const NOT_AUTHORIZED_CODE = 401;
-  const NOT_FOUND_CODE = 404;
-
-  switch (errorResponse.status) {
-    case WRONG_REQUEST_CODE:
-      return `Неверный запрос`;
-    case NOT_AUTHORIZED_CODE:
-      return `Пользователь не авторизован`;
-    case NOT_FOUND_CODE:
-      return `Ничего не найдено`;
-    default:
-      return `Cтатус ответа: ` + errorResponse.status + ` ` + errorResponse.statusText;
-  }
-};
-
-let sendRequest = function (url, body, onSuccessCallback, onErrorCallback ) { // data это то что передаем на сервер, см. ниже
+let sendRequest = function (url, body, onSuccessCallback, onErrorCallback) {
   let xhr = new XMLHttpRequest();
   xhr.responseType = `json`;
 
@@ -153,40 +136,8 @@ let sendRequest = function (url, body, onSuccessCallback, onErrorCallback ) { //
 
   xhr.timeout = 10000;
 
-  xhr.open(body ? 'POST' : 'GET', url);
+  xhr.open(body ? `POST` : `GET`, url);
   xhr.send(body);
-};
-
-let sendRequestFetch = function (url, body, onSuccessCallback, onErrorCallback,) {
-  const params = {
-    method: body ? 'POST' : 'GET',
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    },
-  };
-
-  if(body) {
-    params.body = body;
-  }
-
-  fetch(url, params)
-    .then((response) => {
-      if(response.ok) {
-        return response.json();
-      } else {
-        return new Promise((resolve, reject) => {
-          reject(response);
-        });
-      }
-    })
-    .then((responseData) => {
-      data = responseData.filter((item) => item.offer);
-
-      onSuccessCallback(data);
-    })
-    .catch((error) => {
-      onErrorCallback(getErrorMessage(error));
-    });
 };
 
 window.request = {
@@ -195,6 +146,7 @@ window.request = {
   getData,
   sendRequest,
 };
+
 })();
 
 (() => {
@@ -259,7 +211,7 @@ let overlayCloseHandlerEsc = function (evt) {
 
 
 let setRenderedCardHandlers = function () {
-  document.querySelector(`.map__pins`).addEventListener(`click`, mapPinHandler); // браузер автоматически передает параметр event, т.к. он там есть. и автоматом когда срабатывает обработчик вызывает ф-цию
+  document.querySelector(`.map__pins`).addEventListener(`click`, mapPinHandler);
   document.querySelector(`.map__pins`).addEventListener(`keydown`, mapPinHandler);
 };
 
@@ -319,6 +271,17 @@ let deactivateAllAdForm = function () {
     node.remove();
   });
 
+  if (document.querySelector(`.map__card`)) {
+    document.querySelector(`.map__card`).remove();
+  }
+
+  document.querySelector(`.ad-form-header__preview img`).src = `img/muffin-grey.svg`;
+  document.querySelectorAll(`.ad-form__photo img`).forEach((img) => {
+    img.remove();
+  });
+
+
+  setCurrentAddress();
   disableAdform();
 };
 
@@ -339,10 +302,10 @@ form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
 
   window.request.sendRequest(
-    window.request.URL_UPLOAD_ADDRESS,
-    new FormData(form),
-    window.service.onSuccessSendCallback,
-    window.service.onErrorSendCallback
+      window.request.URL_UPLOAD_ADDRESS,
+      new FormData(form),
+      window.service.onSuccessSendCallback,
+      window.service.onErrorSendCallback
   );
 
   window.handlers.deactivateAllAdForm();
@@ -457,7 +420,7 @@ let setCardAddress = function (cardName, cardNumber) {
 let setCardPrice = function (cardName, cardNumber) {
   let templateCardPrice = cardName.querySelector(`.popup__text--price`);
 
-  templateCardPrice.textContent = ``; // обнуляем старые значения
+  templateCardPrice.textContent = ``;
   templateCardPrice.textContent = (`${window.filter.getFilteredAds()[cardNumber].offer.price}₽ /ночь`);
 };
 
@@ -490,7 +453,7 @@ let setCardFeatures = function (cardName, cardNumber) {
     fragmentsFeatures.appendChild(createElementFeature);
   }
 
-  templateCardFeatures.textContent = ``; // обнуляем старые значения
+  templateCardFeatures.textContent = ``;
 
   templateCardFeatures.appendChild(fragmentsFeatures);
 };
@@ -519,7 +482,7 @@ let setCardPhotos = function (cardName, cardNumber) {
     fragmentsPhotos.appendChild(createElementPhoto);
   }
 
-  templateCardPhotos.textContent = ``; // обнуляем старые значения
+  templateCardPhotos.textContent = ``;
 
   templateCardPhotos.appendChild(fragmentsPhotos);
 };
@@ -533,11 +496,11 @@ let setCardAvatar = function (cardName, cardNumber) {
 let renderCard = function (evt) {
   let mapCard = document.querySelector(`.map__card`);
 
-  if (!evt || !evt.target.dataset.id) { // вся ф-ция заканчивается после return - если не получаем evt или dataset.id (id это начинка dataset)
+  if (!evt || !evt.target.dataset.id) {
     return;
   }
 
-  if (mapCard) { // удаляем предыдущее объявление
+  if (mapCard) {
     mapCard.remove();
   }
 
@@ -680,6 +643,8 @@ window.filter = {
 
 
 const MAX_AD_QTY = 5;
+const PIN_SHIWT_WIDTH = 20;
+const PIN_SHIWT_HEIGHT = 40;
 
 let renderPins = function (data) {
   let fragment = document.createDocumentFragment();
@@ -689,8 +654,8 @@ let renderPins = function (data) {
     let newPin = document.querySelector(`#pin`).content.querySelector(`.map__pin`).cloneNode(true);
     let avatarImg = newPin.querySelector(`img`);
 
-    newPin.style.left = (data[pinNum].location.x - 20) + `px`;
-    newPin.style.top = (data[pinNum].location.y - 40) + `px`;
+    newPin.style.left = (data[pinNum].location.x - PIN_SHIWT_WIDTH) + `px`;
+    newPin.style.top = (data[pinNum].location.y - PIN_SHIWT_HEIGHT) + `px`;
     newPin.dataset.id = pinNum;
 
     avatarImg.src = data[pinNum].author.avatar;
@@ -796,10 +761,10 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
 
 
 const ROOMS_TO_GUESTS_MAP = {
-  '1': [`1`], //  js по умолчанию получает из html string
+  '1': [`1`],
   '2': [`1`, `2`],
   '3': [`1`, `2`, `3`],
-  '100': [`0`] // вынесено за скобки чтобы каждый раз не собирался объект внутри функции
+  '100': [`0`]
 };
 const EARLY_CHECKTIME = `12:00`;
 const MIDDLE_CHECKTIME = `13:00`;
@@ -811,7 +776,7 @@ const MIN_PRICE_PALACE = 10000;
 
 let adFormElement = document.querySelector(`#adForm`);
 
-adFormElement.addEventListener(`input`, function (evt) { // общий обработчик на form (делегирование событий)
+adFormElement.addEventListener(`input`, function (evt) {
   let inputId = evt.target.id;
   let inputTarget = evt.target;
 
@@ -852,7 +817,7 @@ let setTitleValidation = function (inputTarget) {
       inputTarget.setCustomValidity(``);
     }
 
-    inputTarget.reportValidity(); // нужен reportValidity тк после setCustomValidity браузер далее валидность не проверяет
+    inputTarget.reportValidity();
   });
 };
 
