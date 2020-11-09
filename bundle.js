@@ -12,7 +12,7 @@ let nodeSuccess = document.querySelector(`#success`).content;
 let nodeError = document.querySelector(`#error`).content;
 
 let onSuccessSendCallback = function () {
-  let newNode = nodeSuccess.cloneNode(true).querySelector(`.success`); // без повторного поиска внутри клонноды .querySelector(`.success`)не добавляется элемент в body
+  let newNode = nodeSuccess.cloneNode(true).querySelector(`.success`);
 
   newNode.classList.add(`overlay`);
 
@@ -75,6 +75,7 @@ window.service = {
   \***********************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements:  */
+/* eslint-disable object-shorthand */
 
 
 let URL_LOAD_ADDRESS = `https://21.javascript.pages.academy/keksobooking/data`;
@@ -86,43 +87,7 @@ let getData = function () {
   return data;
 };
 
-let getServerData = function (url, onSuccsessCallback, onErrorCallback) {
-
-  const WRONG_REQUEST_CODE = 400;
-  const NOT_AUTHORIZED_CODE = 401;
-  const NOT_FOUND_CODE = 404;
-  let error;
-
-  return fetch(url)
-    .then(function (response) {
-      if (response.status >= 400) {
-        switch (response.status) {
-          case WRONG_REQUEST_CODE:
-            error = `Неверный запрос`;
-            break;
-          case NOT_AUTHORIZED_CODE:
-            error = `Пользователь не авторизован`;
-            break;
-          case NOT_FOUND_CODE:
-            error = `Ничего не найдено`;
-            break;
-
-          default:
-            error = `Cтатус ответа: : ` + response.status + ` ` + response.statusText;
-        }
-
-        return onErrorCallback(error);
-      }
-
-      return response.json()
-        .then(function (forClientData) {
-          data = forClientData.filter((item) => item.offer); // оставляем только те что содержат item.offer
-          onSuccsessCallback(data);
-        });
-    });
-};
-
-let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) { // data это то что передаем на сервер, см. ниже
+let sendRequest = function (url, body, onSuccessCallback, onErrorCallback) { // data это то что передаем на сервер, см. ниже
   let xhr = new XMLHttpRequest();
   xhr.responseType = `json`;
 
@@ -135,7 +100,13 @@ let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) 
 
     switch (xhr.status) {
       case SUCCESS_CODE:
-        onSuccessCallback();
+        let response = xhr.response;
+
+        if (Array.isArray(response)) {
+          data = response.filter((item) => item.offer);
+        }
+
+        onSuccessCallback(data);
         break;
       case WRONG_REQUEST_CODE:
         error = `Неверный запрос`;
@@ -165,17 +136,64 @@ let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) 
 
   xhr.timeout = 10000;
 
-  xhr.open(`POST`, url);
-  xhr.send(clientData); // отправка данных data на сервер
+  xhr.open(body ? `POST` : `GET`, url);
+  xhr.send(body);
 };
 
+// let getErrorMessage = function (errorResponse) {
+//   const WRONG_REQUEST_CODE = 400;
+//   const NOT_AUTHORIZED_CODE = 401;
+//   const NOT_FOUND_CODE = 404;
+
+//   switch (errorResponse.status) {
+//     case WRONG_REQUEST_CODE:
+//       return `Неверный запрос`;
+//     case NOT_AUTHORIZED_CODE:
+//       return `Пользователь не авторизован`;
+//     case NOT_FOUND_CODE:
+//       return `Ничего не найдено`;
+//     default:
+//       return `Cтатус ответа: ` + errorResponse.status + ` ` + errorResponse.statusText;
+//   }
+// };
+
+// let sendRequestFetch = function (url, body, onSuccessCallback, onErrorCallback) {
+//   const params = {
+//     method: body ? `POST` : `GET`,
+//     headers: {
+//       'Content-Type': `multipart/form-data`
+//     },
+//   };
+
+//   if (body) {
+//     params.body = body;
+//   }
+
+//   fetch(url, params)
+//     .then((response) => {
+//       if (response.ok) {
+//         return response.json();
+//       } else {
+//         return new Promise((resolve, reject) => {
+//           reject(response);
+//         });
+//       }
+//     })
+//     .then((responseData) => {
+//       data = responseData.filter((item) => item.offer);
+
+//       onSuccessCallback(data);
+//     })
+//     .catch((error) => {
+//       onErrorCallback(getErrorMessage(error));
+//     });
+// };
 
 window.request = {
   URL_LOAD_ADDRESS,
   URL_UPLOAD_ADDRESS,
-  getServerData,
   getData,
-  uploadData,
+  sendRequest,
 };
 
 })();
@@ -192,7 +210,7 @@ let mapPin = document.querySelector(`.map__pin--main`);
 let mapFaded = document.querySelector(`.map--faded`);
 let map = document.querySelector(`.map`);
 let mapFilters = document.querySelectorAll(`.map__filter`);
-let mapFeaures = document.querySelector(`.map__features`);
+let mapFeatures = document.querySelector(`.map__features`);
 let adForm = document.querySelector(`.ad-form`);
 let mapAdFormDisabled = document.querySelector(`.ad-form--disabled`);
 let adFormAll = document.querySelectorAll(`.ad-form__element`);
@@ -242,7 +260,7 @@ let overlayCloseHandlerEsc = function (evt) {
 
 
 let setRenderedCardHandlers = function () {
-  document.querySelector(`.map__pins`).addEventListener(`click`, mapPinHandler); // браузер автоматически передает параметр event, т.к. он там есть. и автоматом когда срабатывает обработчик вызывает ф-цию
+  document.querySelector(`.map__pins`).addEventListener(`click`, mapPinHandler);
   document.querySelector(`.map__pins`).addEventListener(`keydown`, mapPinHandler);
 };
 
@@ -257,7 +275,7 @@ let disableAdform = function () {
     feature.setAttribute(`disabled`, `disabled`);
   }
 
-  mapFeaures.setAttribute(`disabled`, `disabled`);
+  mapFeatures .setAttribute(`disabled`, `disabled`);
 };
 
 let enableAdForm = function () {
@@ -268,7 +286,7 @@ let enableAdForm = function () {
     feature.removeAttribute(`disabled`);
   }
 
-  mapFeaures.removeAttribute(`disabled`);
+  mapFeatures .removeAttribute(`disabled`);
 };
 
 let setCurrentAddress = function () {
@@ -285,7 +303,7 @@ let activateAllAdForm = function () {
 
   document.querySelector(`#title`).setAttribute(`required`, `required`);
 
-  window.request.getServerData(window.request.URL_LOAD_ADDRESS, window.filter.updateData, window.service.onErrorReceiveCallback);
+  window.request.sendRequest(window.request.URL_LOAD_ADDRESS, null, window.filter.updateData, window.service.onErrorReceiveCallback);
   enableAdForm();
 };
 
@@ -301,6 +319,14 @@ let deactivateAllAdForm = function () {
   document.querySelectorAll(`.map__pin[type=button]`).forEach(function (node) {
     node.remove();
   });
+
+  document.querySelectorAll(`.ad-form__photo`).forEach(function (node) {
+    node.remove();
+  });
+
+  document.querySelector(`.ad-form-header__preview img`).src = `img/muffin-grey.svg`;
+
+  setCurrentAddress();
 
   disableAdform();
 };
@@ -321,8 +347,12 @@ let mapFadedHandler = function (evt) {
 form.addEventListener(`submit`, function (evt) {
   evt.preventDefault();
 
-  window.request.uploadData(window.request.URL_UPLOAD_ADDRESS, window.service.onSuccessSendCallback,
-      window.service.onErrorSendCallback, (new FormData(form))); // FormData автоматически считывает поля из form
+  window.request.sendRequest(
+      window.request.URL_UPLOAD_ADDRESS,
+      new FormData(form),
+      window.service.onSuccessSendCallback,
+      window.service.onErrorSendCallback
+  );
 
   window.handlers.deactivateAllAdForm();
 });
@@ -335,6 +365,7 @@ mapPin.addEventListener(`keydown`, mapFadedHandler);
 
 resetButton.addEventListener(`click`, deactivateAllAdForm);
 
+setCurrentAddress();
 setRenderedCardHandlers();
 disableAdform();
 
@@ -435,7 +466,7 @@ let setCardAddress = function (cardName, cardNumber) {
 let setCardPrice = function (cardName, cardNumber) {
   let templateCardPrice = cardName.querySelector(`.popup__text--price`);
 
-  templateCardPrice.textContent = []; // обнуляем старые значения
+  templateCardPrice.textContent = ``; // обнуляем старые значения
   templateCardPrice.textContent = (`${window.filter.getFilteredAds()[cardNumber].offer.price}₽ /ночь`);
 };
 
@@ -468,7 +499,7 @@ let setCardFeatures = function (cardName, cardNumber) {
     fragmentsFeatures.appendChild(createElementFeature);
   }
 
-  templateCardFeatures.textContent = []; // обнуляем старые значения
+  templateCardFeatures.textContent = ``; // обнуляем старые значения
 
   templateCardFeatures.appendChild(fragmentsFeatures);
 };
@@ -497,7 +528,7 @@ let setCardPhotos = function (cardName, cardNumber) {
     fragmentsPhotos.appendChild(createElementPhoto);
   }
 
-  templateCardPhotos.textContent = []; // обнуляем старые значения
+  templateCardPhotos.textContent = ``; // обнуляем старые значения
 
   templateCardPhotos.appendChild(fragmentsPhotos);
 };
@@ -511,11 +542,11 @@ let setCardAvatar = function (cardName, cardNumber) {
 let renderCard = function (evt) {
   let mapCard = document.querySelector(`.map__card`);
 
-  if (!evt || !evt.target.dataset.id) { // вся ф-ция заканчивается после return - если не получаем evt или dataset.id (id это начинка dataset)
+  if (!evt || !evt.target.dataset.id) {
     return;
   }
 
-  if (mapCard) { // удаляем предыдущее объявление
+  if (mapCard) {
     mapCard.remove();
   }
 
@@ -556,7 +587,7 @@ window.card = {
 
 const DEFAULT_FILTER_VALUE = `any`;
 
-const filters = { // константу внутри менять можно, нельзя записывать туда что-то новое (новую ссылку на другой объект). с примитивами не работает
+const filters = {
   'housing-type': DEFAULT_FILTER_VALUE,
   'housing-price': DEFAULT_FILTER_VALUE,
   'housing-rooms': DEFAULT_FILTER_VALUE,
@@ -582,11 +613,11 @@ let getFilteredAds = function () {
   return filteredAds;
 };
 
-let checkFeature = function (item) { // !логика для несклольких filters.feature сразу
+let checkFeature = function (item) {
   for (let featureKey in filters.features) {
     if (filters.features[featureKey].value
       && !item.offer.features.includes(filters.features[featureKey].key)
-    ) { // если значение true но его нет в features item'a то сразу false
+    ) {
       return false;
     }
   }
@@ -594,7 +625,7 @@ let checkFeature = function (item) { // !логика для несклольк�
   return true;
 };
 
-let filterPrice = function (item) { // !!!
+let filterPrice = function (item) {
   return filters[`housing-price`] === DEFAULT_FILTER_VALUE
     || item.offer.price > priceMap[filters[`housing-price`]].min && item.offer.price < priceMap[filters[`housing-price`]].max;
 };
@@ -612,7 +643,7 @@ let filterGuests = function (item) {
 };
 
 const updateData = function () {
-  filteredAds = window.request.getData().filter(function (item) { // фильтр возвращает новый массив return которых будет true
+  filteredAds = window.request.getData().filter(function (item) {
     return filterPrice(item) && filterType(item) && filterRooms(item) && filterGuests(item) && checkFeature(item);
   });
 
@@ -622,7 +653,7 @@ const updateData = function () {
 
 let setFilterChangeCather = function () {
   document.querySelector(`.map__filters`).addEventListener(`change`, function (evt) {
-    document.querySelectorAll(`button[data-id]`).forEach(function (pin) { // элементы button которые содержат атрибут data-id
+    document.querySelectorAll(`button[data-id]`).forEach(function (pin) {
       pin.remove();
     });
 
@@ -636,7 +667,7 @@ let setFilterChangeCather = function () {
       filters.features[evt.target.id].value = !filters.features[evt.target.id].value;
     }
 
-    window.debounce.fixDebounce(updateData); // передаем невызванную ф-цию updateData а не updateData(). до этого был результат вызова ф-ции в связи с чем вылетала ошибка
+    window.debounce.fixDebounce(updateData);
   });
 };
 
@@ -657,9 +688,11 @@ window.filter = {
 /*! runtime requirements:  */
 
 
+const MAX_AD_QTY = 5;
+
 let renderPins = function (data) {
   let fragment = document.createDocumentFragment();
-  let maxAdQuantity = Math.min(data.length, 5);
+  let maxAdQuantity = Math.min(data.length, MAX_AD_QTY);
 
   for (let pinNum = 0; pinNum < maxAdQuantity; pinNum++) {
     let newPin = document.querySelector(`#pin`).content.querySelector(`.map__pin`).cloneNode(true);
@@ -699,11 +732,11 @@ let pinHandle = document.querySelector(`.map__pin--main`);
 pinHandle.addEventListener(`mousedown`, function (evt) {
 
   let startCoords = {
-    x: evt.clientX, // положение мыши на экране
+    x: evt.clientX,
     y: evt.clientY
   };
 
-  let dragged = false; // флаг для отлова движения
+  let dragged = false;
 
   let onMouseMove = function (moveEvt) {
     moveEvt.preventDefault();
@@ -715,7 +748,7 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
       y: startCoords.y - moveEvt.clientY
     };
 
-    startCoords = { // цепочка обсластей видимости. записываем в родительский startCoords
+    startCoords = {
       x: moveEvt.clientX,
       y: moveEvt.clientY
     };
@@ -734,7 +767,7 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
       }
     };
 
-    pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`; // тк pin на абсолюте, создаем сдвиг
+    pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 192, 692) + `px`; // тк pin на абсолюте, создаем сдвиг
     pinHandle.style.left = checkerCoords((pinHandle.offsetLeft - shift.x), 0, 1130) + `px`;
 
     window.handlers.setCurrentAddress();
@@ -756,7 +789,7 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
   };
 
 
-  document.addEventListener(`mousemove`, onMouseMove); // именно на document. так как движение и отжатие отслеживаем на всей странице
+  document.addEventListener(`mousemove`, onMouseMove);
   document.addEventListener(`mouseup`, onMouseUp);
 });
 
@@ -772,10 +805,10 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
 
 
 const ROOMS_TO_GUESTS_MAP = {
-  '1': [`1`], //  js по умолчанию получает из html string
+  '1': [`1`],
   '2': [`1`, `2`],
   '3': [`1`, `2`, `3`],
-  '100': [`0`] // вынесено за скобки чтобы каждый раз не собирался объект внутри функции
+  '100': [`0`]
 };
 const EARLY_CHECKTIME = `12:00`;
 const MIDDLE_CHECKTIME = `13:00`;
@@ -787,7 +820,7 @@ const MIN_PRICE_PALACE = 10000;
 
 let adFormElement = document.querySelector(`#adForm`);
 
-adFormElement.addEventListener(`input`, function (evt) { // общий обработчик на form (делегирование событий)
+adFormElement.addEventListener(`input`, function (evt) {
   let inputId = evt.target.id;
   let inputTarget = evt.target;
 
@@ -828,7 +861,7 @@ let setTitleValidation = function (inputTarget) {
       inputTarget.setCustomValidity(``);
     }
 
-    inputTarget.reportValidity(); // нужен reportValidity тк после setCustomValidity браузер далее валидность не проверяет
+    inputTarget.reportValidity();
   });
 };
 
@@ -936,15 +969,15 @@ window.validation.setAllowedFiles();
 /*! runtime requirements:  */
 
 
-const DEBOUNCE_INTERVAL = 300; // ms
+const DEBOUNCE_INTERVAL = 500; // ms
 
 let lastTimeout;
 
 let fixDebounce = function (cb) {
   if (lastTimeout) {
-    window.clearTimeout(lastTimeout); // пока не выполнено это действия все остальные действия будут откидываться (п2)
+    window.clearTimeout(lastTimeout);
   }
-  lastTimeout = window.setTimeout(cb, DEBOUNCE_INTERVAL); // метод setTimeout возвращает id установленного таймера (п1)
+  lastTimeout = window.setTimeout(cb, DEBOUNCE_INTERVAL);
 
 };
 

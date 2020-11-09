@@ -1,3 +1,4 @@
+/* eslint-disable object-shorthand */
 'use strict';
 
 let URL_LOAD_ADDRESS = `https://21.javascript.pages.academy/keksobooking/data`;
@@ -9,43 +10,7 @@ let getData = function () {
   return data;
 };
 
-let getServerData = function (url, onSuccsessCallback, onErrorCallback) {
-
-  const WRONG_REQUEST_CODE = 400;
-  const NOT_AUTHORIZED_CODE = 401;
-  const NOT_FOUND_CODE = 404;
-  let error;
-
-  return fetch(url)
-    .then(function (response) {
-      if (response.status >= 400) {
-        switch (response.status) {
-          case WRONG_REQUEST_CODE:
-            error = `Неверный запрос`;
-            break;
-          case NOT_AUTHORIZED_CODE:
-            error = `Пользователь не авторизован`;
-            break;
-          case NOT_FOUND_CODE:
-            error = `Ничего не найдено`;
-            break;
-
-          default:
-            error = `Cтатус ответа: : ` + response.status + ` ` + response.statusText;
-        }
-
-        return onErrorCallback(error);
-      }
-
-      return response.json()
-        .then(function (forClientData) {
-          data = forClientData.filter((item) => item.offer);
-          onSuccsessCallback(data);
-        });
-    });
-};
-
-let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) {
+let sendRequest = function (url, body, onSuccessCallback, onErrorCallback) { // data это то что передаем на сервер, см. ниже
   let xhr = new XMLHttpRequest();
   xhr.responseType = `json`;
 
@@ -58,7 +23,13 @@ let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) 
 
     switch (xhr.status) {
       case SUCCESS_CODE:
-        onSuccessCallback();
+        let response = xhr.response;
+
+        if (Array.isArray(response)) {
+          data = response.filter((item) => item.offer);
+        }
+
+        onSuccessCallback(data);
         break;
       case WRONG_REQUEST_CODE:
         error = `Неверный запрос`;
@@ -88,15 +59,62 @@ let uploadData = function (url, onSuccessCallback, onErrorCallback, clientData) 
 
   xhr.timeout = 10000;
 
-  xhr.open(`POST`, url);
-  xhr.send(clientData);
+  xhr.open(body ? `POST` : `GET`, url);
+  xhr.send(body);
 };
 
+// let getErrorMessage = function (errorResponse) {
+//   const WRONG_REQUEST_CODE = 400;
+//   const NOT_AUTHORIZED_CODE = 401;
+//   const NOT_FOUND_CODE = 404;
+
+//   switch (errorResponse.status) {
+//     case WRONG_REQUEST_CODE:
+//       return `Неверный запрос`;
+//     case NOT_AUTHORIZED_CODE:
+//       return `Пользователь не авторизован`;
+//     case NOT_FOUND_CODE:
+//       return `Ничего не найдено`;
+//     default:
+//       return `Cтатус ответа: ` + errorResponse.status + ` ` + errorResponse.statusText;
+//   }
+// };
+
+// let sendRequestFetch = function (url, body, onSuccessCallback, onErrorCallback) {
+//   const params = {
+//     method: body ? `POST` : `GET`,
+//     headers: {
+//       'Content-Type': `multipart/form-data`
+//     },
+//   };
+
+//   if (body) {
+//     params.body = body;
+//   }
+
+//   fetch(url, params)
+//     .then((response) => {
+//       if (response.ok) {
+//         return response.json();
+//       } else {
+//         return new Promise((resolve, reject) => {
+//           reject(response);
+//         });
+//       }
+//     })
+//     .then((responseData) => {
+//       data = responseData.filter((item) => item.offer);
+
+//       onSuccessCallback(data);
+//     })
+//     .catch((error) => {
+//       onErrorCallback(getErrorMessage(error));
+//     });
+// };
 
 window.request = {
   URL_LOAD_ADDRESS,
   URL_UPLOAD_ADDRESS,
-  getServerData,
   getData,
-  uploadData,
+  sendRequest,
 };

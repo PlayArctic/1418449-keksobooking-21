@@ -40,7 +40,7 @@ pinHandle.addEventListener(`mousedown`, function (evt) {
       }
     };
 
-    pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 130, 630) + `px`;
+    pinHandle.style.top = checkerCoords((pinHandle.offsetTop - shift.y), 192, 692) + `px`; // тк pin на абсолюте, создаем сдвиг
     pinHandle.style.left = checkerCoords((pinHandle.offsetLeft - shift.x), 0, 1130) + `px`;
 
     window.handlers.setCurrentAddress();
